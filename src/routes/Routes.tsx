@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 
 import { lazy, Suspense } from "react";
-const LoginPage = lazy(() => import("@/app/pages/Login"));
+const LoginPage = lazy(() => import("@/app/pages/auth/Login"));
 export default function Routes() {
   const router = createBrowserRouter(
     createRoutesFromElements(
