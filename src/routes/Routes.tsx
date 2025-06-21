@@ -14,6 +14,7 @@ const Quiz = lazy(() => import("@/app/pages/Quiz"));
 const HiringUpdates = lazy(() => import("@/app/pages/Hiring"));
 const About = lazy(() => import("@/app/pages/About"));
 const Profile = lazy(() => import("@/app/pages/Profile"));
+const QuizPage = lazy(() => import("@/app/pages/QuizPage/QuizPage"));
 
 
 
@@ -39,6 +40,15 @@ export default function Routes() {
                 <Quiz />
               </Suspense>
             </BaseLayout>
+          }
+        />
+        <Route
+          path="/quizPage"
+          element={
+            
+              <Suspense fallback={<div>Loading...</div>}>
+                <QuizPage />
+              </Suspense>
           }
         />
         <Route

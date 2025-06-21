@@ -1,0 +1,81 @@
+// src/app/pages/QuizPage/components/QuestionPanel.tsx
+import React from "react";
+
+interface Props {
+  question: {
+    id: number;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  };
+  selectedOption: string | null;
+  onOptionChange: (value: string) => void;
+  onClear: () => void;
+  onNext: () => void;
+  onSaveMarkForReview: () => void;
+  setShowSummary: (value: boolean) => void;
+}
+
+const QuestionPanel: React.FC<Props> = ({
+  question,
+  selectedOption,
+  onOptionChange,
+  onClear,
+  onNext,
+  onSaveMarkForReview,
+  setShowSummary,
+}) => {
+  return (
+    <div className="flex-1 bg-white rounded-lg shadow-md p-6">
+      <h2 className="text-lg font-semibold mb-4">
+        Q{question.id}. {question.question}
+      </h2>
+      <div className="space-y-3 mb-4">
+        {question.options.map((option, idx) => (
+          <label
+            key={idx}
+            className="block bg-gray-100 p-3 rounded cursor-pointer hover:bg-gray-200"
+          >
+            <input
+              type="radio"
+              name={`question-${question.id}`}
+              value={option}
+              checked={selectedOption === option}
+              onChange={() => onOptionChange(option)}
+              className="mr-2"
+            />
+            {option}
+          </label>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-3 mt-4">
+        <button
+          onClick={onClear}
+          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+        >
+          Clear
+        </button>
+        <button
+          onClick={onSaveMarkForReview}
+          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+        >
+          Save & Mark for Review
+        </button>
+        <button
+          onClick={onNext}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Next
+        </button>
+        <button
+          onClick={() => setShowSummary(true)}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ml-auto"
+        >
+          Submit Quiz
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default QuestionPanel;

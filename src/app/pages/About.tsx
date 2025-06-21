@@ -25,7 +25,7 @@ const teamData = [
 
 const TeamSection = () => {
   return (
-    <section className="bg-gray-100 pt-0 pb-12">
+    <section className=" pt-0 pb-12">
       <h2 className="text-3xl font-bold text-center mb-8">Development Team</h2>
       <div className="flex justify-center mb-8">
         <div className="w-24 h-1 bg-purple-600 rounded-full"></div>

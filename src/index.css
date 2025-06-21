@@ -79,7 +79,13 @@
 .btn-secondary {
   @apply px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300;
 }
-
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;
