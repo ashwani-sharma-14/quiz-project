@@ -3,7 +3,7 @@ import prisma from "@/utils/prisma";
 import { Difficulty } from "@/generated/prisma";
 
 interface QuizConfig {
-  userId: number;
+  userId: string;
   category: string;
   topics: string[];
   difficulty: Difficulty;
@@ -13,9 +13,9 @@ interface QuizConfig {
 }
 
 interface AnswerSubmission {
-  userQuizId: number;
+  userQuizId: string;
   answers: {
-    questionId: number;
+    questionId: string;
     selectedAnswer: string;
   }[];
 }
@@ -172,7 +172,7 @@ const submitQuiz = async ({ userQuizId, answers }: AnswerSubmission) => {
   };
 };
 
-const getAllUserQuizzes = async (userId: number) => {
+const getAllUserQuizzes = async (userId: string) => {
   const quizzes = await prisma.userQuiz.findMany({
     where: { userId },
     select: {
@@ -191,7 +191,7 @@ const getAllUserQuizzes = async (userId: number) => {
   return quizzes;
 };
 
-const getUserQuizById = async (quizId: number) => {
+const getUserQuizById = async (quizId: string) => {
   const quiz = await prisma.userQuiz.findUnique({
     where: { id: quizId },
     include: {

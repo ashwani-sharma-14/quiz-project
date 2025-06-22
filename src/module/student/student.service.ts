@@ -23,7 +23,7 @@ const createUser = async (
   return user;
 };
 
- const findUserById = async (id: number): Promise<User | null> => {
+ const findUserById = async (id: string): Promise<User | null> => {
   const user = await prisma.user.findUnique({
     where: {
       id,

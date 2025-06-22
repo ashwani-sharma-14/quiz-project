@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            String      @id @default(uuid())
   name          String
   email         String   @unique
   password      String
@@ -25,22 +25,22 @@ model User {
 }
 
 model Admin {
-  id       Int @default(1)
+  id       String @default(uuid())
   name     String
   email    String @id @unique
   password String
 }
 
 model Category {
-  id    Int     @id @default(autoincrement())
+  id    String  @id @default(uuid())
   name  String  @unique
   topic Topic[]
 }
 
 model Topic {
-  id         Int        @id @default(autoincrement())
+  id         String  @id @default(uuid())
   name       String
-  categoryId Int
+  categoryId String
   category   Category   @relation(fields: [categoryId], references: [id])
   questions  Question[]
 
@@ -55,12 +55,12 @@ enum Difficulty {
 }
 
 model Question {
-  id                 Int                 @id @default(autoincrement())
+  id                 String  @id @default(uuid())
   question           String
   options            Json
   correctAns         String
   difficulty         Difficulty
-  topicId            Int
+  topicId            String
   topic              Topic               @relation(fields: [topicId], references: [id])
   quizzes            Quiz[]
   correctInQuizzes   CorrectQuestion[]
@@ -69,16 +69,16 @@ model Question {
 }
 
 model Quiz {
-  id         Int      @id @default(autoincrement())
-  questionId Int
-  userQuizId Int
+  id         String  @id @default(uuid())
+  questionId String
+  userQuizId String
   questions  Question @relation(fields: [questionId], references: [id])
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
 }
 
 model UserQuiz {
-  id     Int  @id @default(autoincrement())
-  userId Int
+  id     String  @id @default(uuid())
+  userId String
   user   User @relation(fields: [userId], references: [id])
 
   category       String
@@ -101,25 +101,30 @@ model UserQuiz {
 }
 
 model CorrectQuestion {
-  id         Int      @id @default(autoincrement())
+  id         String  @id @default(uuid())
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
-  userQuizId Int
+  userQuizId String
   question   Question @relation(fields: [questionId], references: [id])
-  questionId Int
+  questionId String
 }
 
 model WrongQuestion {
-  id         Int      @id @default(autoincrement())
+  id         String  @id @default(uuid())
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
-  userQuizId Int
+  userQuizId String
   question   Question @relation(fields: [questionId], references: [id])
-  questionId Int
+  questionId String
 }
 
 model AttemptedQuestion {
-  id         Int      @id @default(autoincrement())
+  id         String  @id @default(uuid())
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
-  userQuizId Int
+  userQuizId String
   question   Question @relation(fields: [questionId], references: [id])
-  questionId Int
+  questionId String
+}
+
+model Jobs{
+  id String  @id @default(uuid())
+
 }

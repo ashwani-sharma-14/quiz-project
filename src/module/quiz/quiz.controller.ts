@@ -3,16 +3,16 @@ import { Request, Response } from "express";
 import { Difficulty } from "@/generated/prisma";
 import { quizService } from "./quiz.service";
 const generateQuiz = asyncWrap(async (req: Request, res: Response) => {
-  const userIdParam = req.user?.userId;
-  if (!userIdParam) {
+  const userId = req.user?.userId;
+  if (!userId) {
     throw new Error("User ID is required");
   }
-  const userId = parseInt(userIdParam);
+
   const { category, topics, difficulty, totalQuestions, timeLimit, mode } =
     req.query;
 
   const quiz = await quizService.generateQuiz({
-    userId: Number(userId),
+    userId: userId,
     category: String(category),
     topics: String(topics).split(","),
     difficulty: difficulty as Difficulty,
@@ -29,21 +29,21 @@ const submitQuiz = asyncWrap(async (req: Request, res: Response) => {
 });
 
 const getAllUserQuizzes = asyncWrap(async (req: Request, res: Response) => {
-  const userIdParam = req.user?.userId;
-  if (!userIdParam) {
+  const userId = req.user?.userId;
+  if (!userId) {
     throw new Error("User ID is required");
   }
-  const userId = parseInt(userIdParam);
+
   const data = await quizService.getAllUserQuizzes(userId);
   res.json({ quizzes: data });
 });
 
 const getUserQuizById = asyncWrap(async (req: Request, res: Response) => {
-  const quizIdParam = req.params.quizId;
-  if (!quizIdParam) {
+  const quizId = req.params.quizId;
+  if (!quizId) {
     throw new Error("Quiz ID is required");
   }
-  const quizId = parseInt(quizIdParam);
+
   const quiz = await quizService.getUserQuizById(quizId);
   res.json({ quiz });
 });
