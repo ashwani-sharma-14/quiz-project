@@ -8,20 +8,118 @@ datasource db {
   url      = env("DB_URL")
 }
 
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password      String
+  enrollment    String   @unique
+  profile       String
+  branch        String
+  department    String
+  dob           DateTime
+  admissionYear Int
+  currentYear   Int
 
-model User{
-    id            Int    @id @default(autoincrement())
-    name          String
-    email         String @unique
-    password      String
-    enrollment    String @unique
-    profile       String 
-    branch        String
-    department    String
-    dob           DateTime
-    admissionYear Int
-    currentYear   Int
+  quizzes UserQuiz[]
 }
 
+model Admin {
+  id       Int @default(1)
+  name     String
+  email    String @id @unique
+  password String
+}
 
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  topic Topic[]
+}
 
+model Topic {
+  id         Int        @id @default(autoincrement())
+  name       String
+  categoryId Int
+  category   Category   @relation(fields: [categoryId], references: [id])
+  questions  Question[]
+
+  @@unique([name, categoryId])
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  MIXED
+}
+
+model Question {
+  id                 Int                 @id @default(autoincrement())
+  question           String
+  options            Json
+  correctAns         String
+  difficulty         Difficulty
+  topicId            Int
+  topic              Topic               @relation(fields: [topicId], references: [id])
+  quizzes            Quiz[]
+  correctInQuizzes   CorrectQuestion[]
+  wrongInQuizzes     WrongQuestion[]
+  attemptedInQuizzes AttemptedQuestion[]
+}
+
+model Quiz {
+  id         Int      @id @default(autoincrement())
+  questionId Int
+  userQuizId Int
+  questions  Question @relation(fields: [questionId], references: [id])
+  userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
+}
+
+model UserQuiz {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  category       String
+  topics         Json
+  difficulty     Difficulty
+  totalQuestions Int
+  timeLimit      Int
+  mode           String
+  // attempted      Int
+  // correct        Int
+  // wrong          Int
+  score Float
+
+  createdAt DateTime @default(now())
+
+  quizQuestions Quiz[]
+  correct       CorrectQuestion[]
+  wrong         WrongQuestion[]
+  attempted     AttemptedQuestion[]
+}
+
+model CorrectQuestion {
+  id         Int      @id @default(autoincrement())
+  userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
+  userQuizId Int
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+}
+
+model WrongQuestion {
+  id         Int      @id @default(autoincrement())
+  userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
+  userQuizId Int
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+}
+
+model AttemptedQuestion {
+  id         Int      @id @default(autoincrement())
+  userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
+  userQuizId Int
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+}

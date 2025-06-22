@@ -1,21 +1,35 @@
-import { createUser, findUserByEmail } from "./student.service";
+import { studentService } from "./student.service";
 import { Request, Response } from "express";
 import { oauth2Client } from "@/config/google.config";
 import bcrypt from "bcrypt";
 import axios from "axios";
+import { generateTokens } from "@/lib/auth";
+import { setAuthCookie } from "@/lib/cookies";
+
 const signUpUser = async (req: Request, res: Response) => {
   const data = req.body;
-  const { password,dob } = data;
-   data.dob = new Date(dob).toISOString();
+  const { password, dob } = data;
+  data.dob = new Date(dob).toISOString();
   const hashedPassword = await bcrypt.hash(password, 10);
   data.password = hashedPassword;
-  const user = await createUser(data);
-  return res.json({ message: "user created", user }).status(201);
+  const user = await studentService.createUser(data);
+  if (!user) return res.json({ message: "user not created" }).status(401);
+  const { accessToken, refreshToken } = generateTokens({
+    userId: String(user.id),
+    email: user.email,
+  });
+
+  return setAuthCookie(
+    res,
+    accessToken,
+    "User Created and logged in successfully",
+    refreshToken
+  );
 };
 
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user = await findUserByEmail(email);
+  const user = await studentService.findUserByEmail(email);
 
   if (!user) {
     return res.json({ message: "user not found" }).status(401);
@@ -26,7 +40,18 @@ const login = async (req: Request, res: Response) => {
     return res.json({ message: "password not match" }).status(401);
   }
 
-  return res.json({ message: "login success", user }).status(200);
+  const { accessToken, refreshToken } = generateTokens({
+    userId: String(user.id),
+    email: user.email,
+  });
+
+  return setAuthCookie(res, accessToken, "Login Successful", refreshToken);
+};
+
+const logout = async (_req: Request, res: Response) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  return res.json({ message: "Logout successful" }).status(200);
 };
 
 const googleLogin = async (req: Request, res: Response) => {
@@ -48,17 +73,25 @@ const googleLogin = async (req: Request, res: Response) => {
 
   const data = userRes.data;
 
-  const user = await findUserByEmail(data.email);
+  const user = await studentService.findUserByEmail(data.email);
 
   if (!user) {
-    return res.json({ message: "user not found", user }).status(401);
+    return res
+      .json({ message: "user not found please sign up", user })
+      .status(200);
   }
-  return res.json({ message: "login success", user }).status(200);
+
+  const { accessToken, refreshToken } = generateTokens({
+    userId: String(user.id),
+    email: user.email,
+  });
+
+  return setAuthCookie(res, accessToken, "Login Successful", refreshToken);
 };
 
 export const userController = {
   signUpUser,
   login,
   googleLogin,
+  logout,
 };
-

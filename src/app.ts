@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import ApiError from "./utils/ApiError";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import httpStatus from "http-status";
+import path from "path";
+import fs from "fs";
 const app = express();
 
 app.use(
@@ -31,6 +33,15 @@ app.use((req) => {
     `${req.method} ${req.originalUrl} not found`
   );
 });
+
+const uploadsPath = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath);
+}
+
+app.use("/uploads", express.static(uploadsPath));
+
 app.use(globalErrorHandler);
+
 
 export default app;

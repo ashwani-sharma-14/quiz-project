@@ -1,7 +1,7 @@
 import prisma from "@/utils/prisma";
 import { Prisma, User } from "@/generated/prisma";
 
-export const createUser = async (
+const createUser = async (
   data: Prisma.UserCreateInput
 ): Promise<User> => {
   const user = await prisma.user.create({
@@ -10,7 +10,7 @@ export const createUser = async (
   return user;
 };
 
-export const findUserByEmail = async (email: string): Promise<User | null> => {
+ const findUserByEmail = async (email: string): Promise<User | null> => {
   const user = await prisma.user.findUnique({
     where: {
       email,
@@ -23,7 +23,7 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
   return user;
 };
 
-export const findUserById = async (id: number): Promise<User | null> => {
+ const findUserById = async (id: number): Promise<User | null> => {
   const user = await prisma.user.findUnique({
     where: {
       id,
@@ -36,4 +36,9 @@ export const findUserById = async (id: number): Promise<User | null> => {
   return user;
 };
 
+export const studentService = {
+  createUser,
+  findUserByEmail,
+  findUserById,
+};
 
