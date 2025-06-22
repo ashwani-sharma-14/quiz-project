@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id            String      @id @default(uuid())
+  id            String   @id @default(uuid())
   name          String
   email         String   @unique
   password      String
@@ -38,7 +38,7 @@ model Category {
 }
 
 model Topic {
-  id         String  @id @default(uuid())
+  id         String     @id @default(uuid())
   name       String
   categoryId String
   category   Category   @relation(fields: [categoryId], references: [id])
@@ -55,7 +55,7 @@ enum Difficulty {
 }
 
 model Question {
-  id                 String  @id @default(uuid())
+  id                 String              @id @default(uuid())
   question           String
   options            Json
   correctAns         String
@@ -69,7 +69,7 @@ model Question {
 }
 
 model Quiz {
-  id         String  @id @default(uuid())
+  id         String   @id @default(uuid())
   questionId String
   userQuizId String
   questions  Question @relation(fields: [questionId], references: [id])
@@ -77,9 +77,9 @@ model Quiz {
 }
 
 model UserQuiz {
-  id     String  @id @default(uuid())
+  id     String @id @default(uuid())
   userId String
-  user   User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 
   category       String
   topics         Json
@@ -90,7 +90,7 @@ model UserQuiz {
   // attempted      Int
   // correct        Int
   // wrong          Int
-  score Float
+  score          Float
 
   createdAt DateTime @default(now())
 
@@ -101,7 +101,7 @@ model UserQuiz {
 }
 
 model CorrectQuestion {
-  id         String  @id @default(uuid())
+  id         String   @id @default(uuid())
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
   userQuizId String
   question   Question @relation(fields: [questionId], references: [id])
@@ -109,7 +109,7 @@ model CorrectQuestion {
 }
 
 model WrongQuestion {
-  id         String  @id @default(uuid())
+  id         String   @id @default(uuid())
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
   userQuizId String
   question   Question @relation(fields: [questionId], references: [id])
@@ -117,14 +117,19 @@ model WrongQuestion {
 }
 
 model AttemptedQuestion {
-  id         String  @id @default(uuid())
+  id         String   @id @default(uuid())
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
   userQuizId String
   question   Question @relation(fields: [questionId], references: [id])
   questionId String
 }
 
-model Jobs{
-  id String  @id @default(uuid())
-
+model Jobs {
+  id             String  @id @default(uuid())
+  jobTitle       String
+  jobDescription String
+  companyName    String
+  applyLink      String
+  package        String?
+  logo           String
 }
