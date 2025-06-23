@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
-const subjects = ["Aptitude", "DSA"];
+const categories = ["Aptitude", "DSA"];
 const topicsMap = {
   Aptitude: [
     "Numbers",
@@ -38,8 +38,8 @@ const Quiz = () => {
   const [topics, setTopics] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState("Mixed");
   const [questions, setQuestions] = useState(10);
-  const [time, setTime] = useState(30);
-  const [mode, setMode] = useState("Practice");
+  const [time, setTime] = useState(30);;
+  const mode="Review";
 
   const toggleTopic = (topic: string) => {
     setTopics((prev) =>
@@ -52,9 +52,9 @@ const Quiz = () => {
       case 1:
         return (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Select Subject</h2>
+            <h2 className="text-xl font-semibold mb-4">Select Category </h2>
             <div className="grid grid-cols-2 gap-4">
-              {subjects.map((sub) => (
+              {categories.map((sub) => (
                 <button
                   key={sub}
                   className={`border p-4 rounded-lg ${
@@ -128,102 +128,90 @@ const Quiz = () => {
                 className="border px-4 py-2 rounded w-full"
               />
             </div>
-            <div>
-              <label className="block mb-1 font-medium">Mode</label>
-              <div className="flex gap-2">
-                {["Practice", "Exam"].map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setMode(m)}
-                    className={`px-4 py-2 border rounded ${
-                      mode === m ? "bg-blue-100 border-blue-600" : ""
-                    }`}
-                  >
-                    {m} Mode
-                  </button>
-                ))}
-              </div>
-            </div>
+            
           </div>
         );
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-8">
-      <h1 className="text-2xl font-bold mb-6 text-blue-800">
-        Start New Practice
-      </h1>
+    <>
+      <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-2xl font-bold mb-6 text-blue-800">
+          Start New Practice
+        </h1>
 
-      {/* Step Indicator with Connection Line */}
-      <div className="relative mb-6 flex items-center justify-between">
-        <div className="absolute top-1/2 left-0 w-full border-t border-gray-200 z-0" />
-        <div
-          className={`relative z-10 text-sm font-medium px-2 ${
-            step >= 1 ? "text-blue-600" : "text-gray-400"
-          }`}
-        >
-          1. Category
-        </div>
-        <div
-          className={`relative z-10 text-sm font-medium px-2 ${
-            step >= 2 ? "text-blue-600" : "text-gray-400"
-          }`}
-        >
-          2. Topics
-        </div>
-        <div
-          className={`relative z-10 text-sm font-medium px-2 ${
-            step >= 3 ? "text-blue-600" : "text-gray-400"
-          }`}
-        >
-          3. Preference
-        </div>
-      </div>
-
-      {renderStep()}
-
-      {/* Navigation Buttons */}
-      <div className="flex justify-between mt-8">
-        {step > 1 && (
-          <button
-            onClick={() => setStep(step - 1)}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Previous
-          </button>
-        )}
-        {step < 3 ? (
-          <button
-            onClick={() => setStep(step + 1)}
-            disabled={!category || (step === 2 && topics.length === 0)}
-            className={`ml-auto px-6 py-2 rounded ${
-              !category || (step === 2 && topics.length === 0)
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
+        {/* Step Indicator with Connection Line */}
+        <div className="relative mb-6 flex items-center justify-between">
+          <div className="absolute top-1/2 left-0 w-full border-t border-gray-200 z-0" />
+          <div
+            className={`relative z-10 text-sm font-medium px-2 bg-white ${
+              step >= 1 ? "text-blue-600" : "text-gray-400"
             }`}
           >
-            Next
-          </button>
-        ) : (
-          <NavLink
-            to="/quizPage"
-            state={{
-              category,
-              topics,
-              difficulty,
-              questions,
-              time,
-              mode,
-            }}
+            1. Category
+          </div>
+          <div
+            className={`relative z-10 text-sm font-medium px-2 bg-white ${
+              step >= 2 ? "text-blue-600" : "text-gray-400"
+            }`}
           >
-            <button className="ml-auto px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-              Start
+            2. Topics
+          </div>
+          <div
+            className={`relative z-10 text-sm font-medium px-2 bg-white ${
+              step >= 3 ? "text-blue-600" : "text-gray-400"
+            }`}
+          >
+            3. Preference
+          </div>
+        </div>
+
+        {renderStep()}
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-8">
+          {step > 1 && (
+            <button
+              onClick={() => setStep(step - 1)}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Previous
             </button>
-          </NavLink>
-        )}
+          )}
+          {step < 3 ? (
+            <button
+              onClick={() => setStep(step + 1)}
+              disabled={!category || (step === 2 && topics.length === 0)}
+              className={`ml-auto px-6 py-2 rounded ${
+                !category || (step === 2 && topics.length === 0)
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              Next
+            </button>
+          ) : (
+            <NavLink
+              to="/quizPage"
+              state={{
+                category,
+                topics,
+                difficulty,
+                questions,
+                time,
+                mode,
+                
+              }}
+            >
+              <button className="ml-auto px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                Start
+              </button>
+            </NavLink>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

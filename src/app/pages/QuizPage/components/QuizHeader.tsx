@@ -25,13 +25,7 @@ const QuizHeader: React.FC<Props> = ({
   onViewInstructions,
 }) => {
 
-  console.log("QuizHeader rendered with props:", {
-    category,
-    topics,
-    difficulty,
-    mode,
-    remainingTime,
-  });
+ 
   return (
     <div className="flex flex-wrap justify-between items-center bg-white p-4 rounded shadow-md">
       <div className="text-sm">
@@ -49,9 +43,12 @@ const QuizHeader: React.FC<Props> = ({
         </p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-bold">
-          ⏱️ Time Left: {formatTime(remainingTime)}
-        </p>
+        {mode === "Exam" && (
+          <p className="text-sm">
+            <strong>Time Remaining:</strong> {formatTime(remainingTime)}
+          </p>
+        )}
+        
         <button
           className="text-blue-500 underline text-sm mt-2"
           onClick={onViewInstructions}

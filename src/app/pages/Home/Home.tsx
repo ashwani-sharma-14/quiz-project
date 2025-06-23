@@ -4,20 +4,23 @@ const Home = () => {
   return (
     <div className="space-y-10">
       {/* Quiz Card */}
-      <div
-        className="bg-white p-10 rounded-xl shadow text-center"
-        // style={{
-        //   background:
-        //     "linear-gradient(to left, rgba(55, 48, 163, 0.9), rgba(37, 99, 235, 0.9))",
-        // }}
-      >
-        <h2 className="text-3xl font-bold mb-4">Ready for a New Challenge?</h2>
-        <NavLink
-          to="/quiz"
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-800 inline-block"
-        >
-          Start New Quiz
-        </NavLink>
+      <div className="bg-white p-10 rounded-xl shadow text-center">
+        <h2 className="text-3xl font-bold mb-6">Ready for a New Challenge?</h2>
+
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <NavLink
+            to="/quiz"
+            className="px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+          >
+            Start Quiz
+          </NavLink>
+          <NavLink
+            to="/previousQuizzes"
+            className="px-5 py-2 border border-blue-600 text-blue-600 rounded-full hover:bg-blue-200 transition"
+          >
+            View Previous Quizzes
+          </NavLink>
+        </div>
       </div>
 
       {/* Practice Record Cards */}

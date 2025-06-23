@@ -2,6 +2,7 @@
 import React from "react";
 import { X } from "lucide-react";
 
+
 interface SubmissionStatusProps {
   answered: number;
   reviewed: number;
@@ -18,7 +19,7 @@ const SubmissionStatus: React.FC<SubmissionStatusProps> = ({
   onClose,
 }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-white rounded-md p-8 max-w-lg w-full text-center relative shadow-lg">
         <button
           onClick={onClose}
@@ -35,7 +36,10 @@ const SubmissionStatus: React.FC<SubmissionStatusProps> = ({
           <li>Skipped/Unvisited: {total - answered - reviewed}</li>
         </ul>
         <button
-          onClick={onConfirmSubmit}
+          onClick={() => {
+            onConfirmSubmit();
+           
+          }}
           className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
         >
           Submit & View Analysis

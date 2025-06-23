@@ -9,13 +9,18 @@ import { lazy, Suspense } from "react";
 import BaseLayout from "@/app/layouts/BaseLayout";
 
 
-const Home = lazy(() => import("@/app/pages/Home"));
-const Quiz = lazy(() => import("@/app/pages/Quiz"));
-const HiringUpdates = lazy(() => import("@/app/pages/Hiring"));
-const About = lazy(() => import("@/app/pages/About"));
-const Profile = lazy(() => import("@/app/pages/Profile"));
+const Home = lazy(() => import("@/app/pages/Home/Home"));
+const Quiz = lazy(() => import("@/app/pages/Quiz/Quiz"));
+const HiringUpdates = lazy(() => import("@/app/pages/Hiring/Hiring"));
+const About = lazy(() => import("@/app/pages/About/About"));
+const Profile = lazy(() => import("@/app/pages/Profile/Profile"));
 const QuizPage = lazy(() => import("@/app/pages/QuizPage/QuizPage"));
-
+const QuizAnalysis = lazy(
+  () => import("@/app/pages/QuizAnalysis/QuizAnalysis")
+);
+const PreviousQuizzes = lazy(
+  () => import("@/app/pages/PreviousQuizzes/PreviousQuizzes")
+);
 
 
 export default function Routes() {
@@ -51,6 +56,27 @@ export default function Routes() {
               </Suspense>
           }
         />
+        <Route
+          path="/quizAnalysis"
+          element={
+            <BaseLayout>
+              <Suspense fallback={<div>Loading...</div>}>
+                <QuizAnalysis />
+              </Suspense>
+            </BaseLayout>
+          }
+        />
+        <Route
+          path="/previousQuizzes"
+          element={
+            <BaseLayout>
+              <Suspense fallback={<div>Loading...</div>}>
+                <PreviousQuizzes />
+              </Suspense>
+            </BaseLayout>
+          }
+        />
+
         <Route
           path="/hiring"
           element={
