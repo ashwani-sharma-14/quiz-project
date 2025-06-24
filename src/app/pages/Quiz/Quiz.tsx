@@ -38,8 +38,8 @@ const Quiz = () => {
   const [topics, setTopics] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState("Mixed");
   const [questions, setQuestions] = useState(10);
-  const [time, setTime] = useState(30);;
-  const mode="Review";
+  const [time, setTime] = useState(30);
+  const mode = "Exam";
 
   const toggleTopic = (topic: string) => {
     setTopics((prev) =>
@@ -52,13 +52,17 @@ const Quiz = () => {
       case 1:
         return (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Select Category </h2>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+              Select a Category
+            </h2>
             <div className="grid grid-cols-2 gap-4">
               {categories.map((sub) => (
                 <button
                   key={sub}
-                  className={`border p-4 rounded-lg ${
-                    category === sub ? "bg-blue-100 border-blue-500" : ""
+                  className={`p-4 border rounded-xl text-lg font-medium transition ${
+                    category === sub
+                      ? "bg-blue-100 border-blue-500 text-blue-700 shadow"
+                      : "hover:bg-gray-50"
                   }`}
                   onClick={() => setCategory(sub)}
                 >
@@ -71,16 +75,22 @@ const Quiz = () => {
       case 2:
         return (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Select Topics</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+              Choose Topics
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[200px] overflow-y-auto pr-2 hide-scrollbar ">
               {topicsMap[category as keyof typeof topicsMap]?.map((topic) => (
-                <label key={topic} className="flex items-center gap-2">
+                <label
+                  key={topic}
+                  className="flex items-center gap-3 bg-gray-50 p-2 rounded-md border hover:bg-gray-100 transition"
+                >
                   <input
                     type="checkbox"
                     checked={topics.includes(topic)}
                     onChange={() => toggleTopic(topic)}
+                    className="accent-blue-600"
                   />
-                  {topic}
+                  <span className="text-gray-700">{topic}</span>
                 </label>
               ))}
             </div>
@@ -88,17 +98,24 @@ const Quiz = () => {
         );
       case 3:
         return (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Set Preferences</h2>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-gray-800">
+              Set Quiz Preferences
+            </h2>
+
             <div>
-              <label className="block mb-1 font-medium">Difficulty</label>
-              <div className="flex gap-2">
+              <label className="block text-gray-600 font-medium mb-2">
+                Difficulty
+              </label>
+              <div className="flex flex-wrap gap-3">
                 {["Mixed", "Easy", "Medium", "Hard"].map((level) => (
                   <button
                     key={level}
                     onClick={() => setDifficulty(level)}
-                    className={`px-4 py-2 rounded border ${
-                      difficulty === level ? "bg-blue-100 border-blue-600" : ""
+                    className={`px-4 py-2 rounded-md border text-sm transition font-medium ${
+                      difficulty === level
+                        ? "bg-blue-100 border-blue-600 text-blue-700 shadow"
+                        : "border-gray-300 text-gray-600 hover:bg-gray-50"
                     }`}
                   >
                     {level}
@@ -106,84 +123,78 @@ const Quiz = () => {
                 ))}
               </div>
             </div>
+
             <div>
-              <label className="block mb-1 font-medium">
+              <label className="block text-gray-600 font-medium mb-2">
                 Number of Questions
               </label>
               <input
                 type="number"
                 value={questions}
                 onChange={(e) => setQuestions(Number(e.target.value))}
-                className="border px-4 py-2 rounded w-full"
+                className="w-full border border-gray-300 px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label className="block mb-1 font-medium">
-                Time Limit (in minutes)
+              <label className="block text-gray-600 font-medium mb-2">
+                Time Limit (minutes)
               </label>
               <input
                 type="number"
                 value={time}
                 onChange={(e) => setTime(Number(e.target.value))}
-                className="border px-4 py-2 rounded w-full"
+                className="w-full border border-gray-300 px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            
           </div>
         );
     }
   };
 
   return (
-    <>
-      <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-2xl font-bold mb-6 text-blue-800">
+    <div className="min-h-[screen-4rem] bg-gradient-to-br from-blue-50 to-white p-6 sm:p-10">
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 sm:p-10 space-y-8">
+        <h1 className="text-3xl font-extrabold text-blue-700">
           Start New Practice
         </h1>
 
-        {/* Step Indicator with Connection Line */}
-        <div className="relative mb-6 flex items-center justify-between">
-          <div className="absolute top-1/2 left-0 w-full border-t border-gray-200 z-0" />
-          <div
-            className={`relative z-10 text-sm font-medium px-2 bg-white ${
-              step >= 1 ? "text-blue-600" : "text-gray-400"
-            }`}
-          >
-            1. Category
-          </div>
-          <div
-            className={`relative z-10 text-sm font-medium px-2 bg-white ${
-              step >= 2 ? "text-blue-600" : "text-gray-400"
-            }`}
-          >
-            2. Topics
-          </div>
-          <div
-            className={`relative z-10 text-sm font-medium px-2 bg-white ${
-              step >= 3 ? "text-blue-600" : "text-gray-400"
-            }`}
-          >
-            3. Preference
-          </div>
+        {/* Stepper */}
+        <div className="flex justify-between items-center relative pb-4">
+          <div className="absolute top-1/4 left-0 w-full h-0.5 bg-gray-200 z-0" />
+          {[1, 2, 3].map((s) => (
+            <div
+              key={s}
+              className={`relative z-10 w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm ${
+                step >= s
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-gray-700"
+              }`}
+            >
+              {s}
+            </div>
+          ))}
         </div>
 
+        {/* Dynamic Step Content */}
         {renderStep()}
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8">
+        {/* Navigation */}
+        <div className="flex justify-between pt-6">
           {step > 1 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-6 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-md transition"
             >
               Previous
             </button>
           )}
+
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
               disabled={!category || (step === 2 && topics.length === 0)}
-              className={`ml-auto px-6 py-2 rounded ${
+              className={`ml-auto px-6 py-2 rounded-md font-medium transition ${
                 !category || (step === 2 && topics.length === 0)
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-blue-600 text-white hover:bg-blue-700"
@@ -201,17 +212,17 @@ const Quiz = () => {
                 questions,
                 time,
                 mode,
-                
               }}
+              className="ml-auto"
             >
-              <button className="ml-auto px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                Start
+              <button className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition font-medium">
+                Start Quiz
               </button>
             </NavLink>
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

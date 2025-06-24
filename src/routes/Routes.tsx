@@ -12,6 +12,7 @@ import BaseLayout from "@/app/layouts/BaseLayout";
 const Home = lazy(() => import("@/app/pages/Home/Home"));
 const Quiz = lazy(() => import("@/app/pages/Quiz/Quiz"));
 const HiringUpdates = lazy(() => import("@/app/pages/Hiring/Hiring"));
+const HiringPage = lazy(() => import("@/app/pages/Hiring/HiringPage/HiringPage"));
 const About = lazy(() => import("@/app/pages/About/About"));
 const Profile = lazy(() => import("@/app/pages/Profile/Profile"));
 const QuizPage = lazy(() => import("@/app/pages/QuizPage/QuizPage"));
@@ -21,6 +22,7 @@ const QuizAnalysis = lazy(
 const PreviousQuizzes = lazy(
   () => import("@/app/pages/PreviousQuizzes/PreviousQuizzes")
 );
+
 
 
 export default function Routes() {
@@ -83,6 +85,16 @@ export default function Routes() {
             <BaseLayout>
               <Suspense fallback={<div>Loading...</div>}>
                 <HiringUpdates />
+              </Suspense>
+            </BaseLayout>
+          }
+        />
+        <Route
+          path="/hiring/:id"
+          element={
+            <BaseLayout>
+              <Suspense fallback={<div>Loading...</div>}>
+                <HiringPage />
               </Suspense>
             </BaseLayout>
           }
