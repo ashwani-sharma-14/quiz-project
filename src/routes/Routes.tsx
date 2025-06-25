@@ -22,6 +22,8 @@ const QuizAnalysis = lazy(
 const PreviousQuizzes = lazy(
   () => import("@/app/pages/PreviousQuizzes/PreviousQuizzes")
 );
+const Login = lazy(() => import("@/app/pages/Login/Login"));
+const Signup = lazy(() => import("@/app/pages/SignUp/Signup"));
 
 
 
@@ -39,6 +41,23 @@ export default function Routes() {
             </BaseLayout>
           }
         />
+   
+        <Route
+          path="/login"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <Login />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <Signup />
+            </Suspense>
+          }
+        />
         <Route
           path="/quiz"
           element={
@@ -52,10 +71,9 @@ export default function Routes() {
         <Route
           path="/quizPage"
           element={
-            
-              <Suspense fallback={<div>Loading...</div>}>
-                <QuizPage />
-              </Suspense>
+            <Suspense fallback={<div>Loading...</div>}>
+              <QuizPage />
+            </Suspense>
           }
         />
         <Route
