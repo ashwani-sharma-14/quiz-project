@@ -1,39 +1,38 @@
 interface Question {
   id: number;
-  question: string;
-  options: string[];
 }
 interface Props {
   questions: Question[];
   currentIndex: number;
-  questionStatus: string[];
+  questionResults: {
+    isCorrect: boolean;
+  }[];
   setCurrentIndex: (index: number) => void;
 }
 
 const SidePanel = ({
   questions,
   currentIndex,
-  questionStatus,
+  questionResults,
   setCurrentIndex,
 }: Props) => {
   return (
     <div className="bg-white shadow-md p-4 rounded-md w-full md:w-72">
       <h3 className="font-semibold text-lg mb-4 text-center">
-        Total Questions: {questions.length}
+        Review Questions
       </h3>
       <div className="grid grid-cols-6 gap-2">
         {questions.map((_, i) => {
-          let colorClass = "bg-white border-gray-400 text-black";
-          if (questionStatus[i] === "answered")
-            colorClass = "bg-green-500 text-white";
-          else if (questionStatus[i] === "savedAndMarkedForReview")
-            colorClass = "bg-purple-600 text-white";
-          else if (i === currentIndex) colorClass = "bg-orange-500 text-white";
+          const { isCorrect } = questionResults[i];
+          let colorClass = "bg-gray-200 text-black border border-gray-300";
+          if (isCorrect) colorClass = "bg-green-500 text-white";
+          else colorClass = "bg-red-500 text-white";
+          if (i === currentIndex) colorClass += " ring-2 ring-yellow-400";
 
           return (
             <button
               key={i}
-              className={`w-8 h-8 rounded-full text-sm border ${colorClass}`}
+              className={`w-8 h-8 rounded-full text-sm ${colorClass}`}
               onClick={() => setCurrentIndex(i)}
             >
               {i + 1}
@@ -42,10 +41,9 @@ const SidePanel = ({
         })}
       </div>
       <div className="text-xs mt-4 space-y-1">
-        <p>🟢 Answered</p>
-        <p>🟣 Saved & Marked for Review</p>
-        <p>🟠 Current Question</p>
-        <p>⚪ Unvisited</p>
+        <p>🟢 Correct</p>
+        <p>🔴 Incorrect</p>
+        <p>🟡 Current</p>
       </div>
     </div>
   );

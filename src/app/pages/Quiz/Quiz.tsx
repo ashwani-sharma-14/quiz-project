@@ -1,5 +1,6 @@
+import { useQuizStore } from "@/store/useQuizStore";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const categories = ["Aptitude", "DSA"];
 const topicsMap = {
@@ -39,7 +40,9 @@ const Quiz = () => {
   const [difficulty, setDifficulty] = useState("Mixed");
   const [questions, setQuestions] = useState(10);
   const [time, setTime] = useState(30);
-  const mode = "Exam";
+  const createQuiz = useQuizStore((state) => state.createQuiz);
+  const isCreatingQuiz = useQuizStore((state) => state.isCreatingQuiz);
+  const navigator = useNavigate();
 
   const toggleTopic = (topic: string) => {
     setTopics((prev) =>
@@ -203,22 +206,24 @@ const Quiz = () => {
               Next
             </button>
           ) : (
-            <NavLink
-              to="/quizPage"
-              state={{
-                category,
-                topics,
-                difficulty,
-                questions,
-                time,
-                mode,
-              }}
-              className="ml-auto"
+            <button
+              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition font-medium"
+              onClick={() => {
+                createQuiz({
+                  category: category,
+                  topics: topics,
+                  difficulty: difficulty,
+                  totalQuestions: questions,
+                  timeLimit: time,
+                });
+                if (!isCreatingQuiz) {
+                  navigator("/quiz/quizScreen");
+                }
+              }
+              }
             >
-              <button className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition font-medium">
-                Start Quiz
-              </button>
-            </NavLink>
+              Start Quiz
+            </button>
           )}
         </div>
       </div>

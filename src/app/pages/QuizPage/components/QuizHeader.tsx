@@ -5,7 +5,6 @@ interface Props {
   category: string;
   topics: string;
   difficulty: string;
-  mode: string;
   remainingTime: number;
   onViewInstructions: () => void;
 }
@@ -20,7 +19,6 @@ const QuizHeader: React.FC<Props> = ({
   category,
   topics,
   difficulty,
-  mode,
   remainingTime,
   onViewInstructions,
 }) => {
@@ -38,17 +36,12 @@ const QuizHeader: React.FC<Props> = ({
         <p>
           <strong>Difficulty:</strong> {difficulty}
         </p>
-        <p>
-          <strong>Mode:</strong> {mode}
-        </p>
       </div>
       <div className="text-center">
-        {mode === "Exam" && (
-          <p className="text-sm">
-            <strong>Time Remaining:</strong> {formatTime(remainingTime)}
-          </p>
-        )}
-        
+        <p className="text-sm">
+          <strong>Time Remaining:</strong> {formatTime(remainingTime)}
+        </p>
+
         <button
           className="text-blue-500 underline text-sm mt-2"
           onClick={onViewInstructions}

@@ -19,6 +19,9 @@ const QuizPage = lazy(() => import("@/app/pages/QuizPage/QuizPage"));
 const QuizAnalysis = lazy(
   () => import("@/app/pages/QuizAnalysis/QuizAnalysis")
 );
+const QuizReview = lazy(
+  () => import("@/app/pages/QuizReview/QuizReview")
+);
 const PreviousQuizzes = lazy(
   () => import("@/app/pages/PreviousQuizzes/PreviousQuizzes")
 );
@@ -69,7 +72,7 @@ export default function Routes() {
           }
         />
         <Route
-          path="/quizPage"
+          path="/quiz/quizScreen"
           element={
             <Suspense fallback={<div>Loading...</div>}>
               <QuizPage />
@@ -77,11 +80,21 @@ export default function Routes() {
           }
         />
         <Route
-          path="/quizAnalysis"
+          path="/quiz/:id/analysis"
           element={
             <BaseLayout>
               <Suspense fallback={<div>Loading...</div>}>
                 <QuizAnalysis />
+              </Suspense>
+            </BaseLayout>
+          }
+        />
+        <Route
+          path="/quiz/:id/review"
+          element={
+            <BaseLayout>
+              <Suspense fallback={<div>Loading...</div>}>
+                <QuizReview />
               </Suspense>
             </BaseLayout>
           }

@@ -1,16 +1,13 @@
 import { create } from "zustand";
 import axiosInstance from "../utils/clientAxiosInstance";
 
-// Define the shape of a user object
 interface User {
   id: string;
   name: string;
   email: string;
   avatar?: string;
-  // Add any other fields returned from your API
 }
 
-// Define the credentials and signup data shapes
 interface LoginCredentials {
   email: string;
   password: string;
@@ -21,10 +18,9 @@ interface SignupData {
   email: string;
   password: string;
   avatar?: File;
-  [key: string]: unknown; // For additional dynamic fields
+  [key: string]: unknown; 
 }
 
-// Define the Auth Store interface
 interface AuthStore {
   authState: User | null;
   isCheckingAuth: boolean;
@@ -41,7 +37,6 @@ interface AuthStore {
   setTheme: (newTheme: string) => void;
 }
 
-// Create the store with types
 export const useAuthStore = create<AuthStore>((set) => ({
   authState: null,
   isCheckingAuth: true,

@@ -1,63 +1,81 @@
-// src/components/QuizAnalysis.tsx
-
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FaCheckCircle,
   FaTimesCircle,
-  FaMinusCircle,
   FaBullseye,
-  FaClipboardCheck,
   FaClock,
 } from "react-icons/fa";
-import { dummyData } from "./dummydata";
 import ProgressBar from "./components/ProgressBar";
-import { NavLink } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
+import { useQuizStore } from "@/store/useQuizStore";
+import { Button } from "@/components/ui/button";
 
 const QuizAnalysis: React.FC = () => {
+  const { quizId } = useParams();
+  const fetchQuiz = useQuizStore((state) => state.fetchQuiz);
+  const quizData = useQuizStore((state) => state.createQuizState);
+
+  useEffect(() => {
+    if (quizId) {
+      fetchQuiz(quizId);
+    }
+  }, [quizId]);
+
+  const navigate = useNavigate();
+
+  if (!quizData?.userQuizData) {
+    return (
+      <div className="text-center mt-10 text-gray-600">Loading analysis...</div>
+    );
+  }
+
   const {
-    title,
+    category,
     totalQuestions,
-    totalMarks,
-    totalTime,
+    timeLimit,
+    score,
     correct,
     incorrect,
-    skipped,
     accuracy,
-    completed,
     timeTaken,
-    score,
-  } = dummyData;
- 
+  } = quizData.userQuizData;
 
+  const totalMarks = totalQuestions;
 
- 
+  const handleReattempt = () => {
+    navigate(`/quiz/quizScreen`);
+  };
+
+  const handleReview = () => {
+   navigate(`/quiz/${quizId}/review`);
+  };
 
   return (
-    <div className="min-h-[screen-4rem] bg-gray-50 px-4 py-8 font-sans text-gray-800">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 px-4 py-8 font-sans text-gray-800">
       {/* Header */}
       <div className="bg-blue-100 p-6 rounded-xl shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
           <div>
-            <h1 className="text-2xl font-bold mb-1">{title}</h1>
+            <h1 className="text-2xl font-bold mb-1">{category}</h1>
             <p className="text-sm text-blue-800">
-              📄 {totalQuestions} Questions • {totalMarks} Marks • {totalTime}{" "}
+              📄 {totalQuestions} Questions • {totalMarks} Marks • {timeLimit}{" "}
               Minutes
             </p>
           </div>
           <div className="flex gap-4 mt-4 sm:mt-0">
-            <NavLink
-              to="/quizPage"
+            <Button
+              onClick={handleReattempt}
+            
               className="px-5 py-2 border border-blue-600 text-blue-600 rounded-full hover:bg-blue-200 transition"
-              
             >
               Reattempt
-            </NavLink>
-            <NavLink
-              to="/quizPage"
+            </Button>
+            <Button
+              onClick={handleReview}
               className="px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
             >
               View Solutions
-            </NavLink>
+            </Button>
           </div>
         </div>
       </div>
@@ -77,45 +95,32 @@ const QuizAnalysis: React.FC = () => {
         </p>
 
         {/* Progress Bars */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
           <ProgressBar
             icon={<FaCheckCircle className="text-green-600" />}
             label="Correct"
-            value={correct}
+            value={correct ?? 0}
             max={totalQuestions}
           />
           <ProgressBar
             icon={<FaTimesCircle className="text-red-500" />}
             label="Incorrect"
-            value={incorrect}
-            max={totalQuestions}
-          />
-          <ProgressBar
-            icon={<FaMinusCircle className="text-gray-500" />}
-            label="Skipped"
-            value={skipped}
+            value={incorrect ?? 0}
             max={totalQuestions}
           />
           <ProgressBar
             icon={<FaBullseye className="text-yellow-500" />}
             label="Accuracy"
-            value={accuracy}
-            max={100}
-            percent
-          />
-          <ProgressBar
-            icon={<FaClipboardCheck className="text-purple-500" />}
-            label="Completed"
-            value={completed}
+            value={accuracy ?? 0}
             max={100}
             percent
           />
           <ProgressBar
             icon={<FaClock className="text-blue-600" />}
             label="Time Taken"
-            value={timeTaken}
-            max={totalTime}
-            valueText={`${timeTaken} mins`}
+            value={timeTaken ?? 0}
+            max={timeLimit}
+            valueText={`${timeTaken ?? 0} mins`}
           />
         </div>
       </div>
