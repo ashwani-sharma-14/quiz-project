@@ -98,10 +98,35 @@ const getAllQuestions = async () => {
   return questions;
 };
 
+const updateQuestion = async (id: string, data: Prisma.QuestionUpdateInput) => {
+  const question = await prisma.question.update({
+    where: { id },
+    data,
+  });
+  return question;
+};
+
+const deleteQuestion = async (id: string) => {
+  const question = await prisma.question.delete({
+    where: { id },
+  });
+  return question;
+};
+
+const getAllQuestionsById = async (id: string) => {
+  const questions = await prisma.question.findMany({
+    where: { topicId: id },
+  });
+  return questions;
+};
+
 export const adminService = {
   createAdmin,
   findAdminByEmail,
   saveQuestionsToDB,
   getAllUsers,
   getAllQuestions,
+  updateQuestion,
+  deleteQuestion,
+  getAllQuestionsById,
 };

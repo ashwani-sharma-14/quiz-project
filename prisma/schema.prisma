@@ -60,6 +60,7 @@ model Question {
   options            Json
   correctAns         String
   difficulty         Difficulty
+  solution           String @db.LongText
   topicId            String
   topic              Topic               @relation(fields: [topicId], references: [id])
   quizzes            Quiz[]
@@ -127,9 +128,10 @@ model AttemptedQuestion {
 model Jobs {
   id             String  @id @default(uuid())
   jobTitle       String
-  jobDescription String
+  jobDescription String @db.LongText
   companyName    String
   applyLink      String
   package        String?
   logo           String
+  location       String?
 }
