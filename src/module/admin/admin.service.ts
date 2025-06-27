@@ -62,6 +62,7 @@ const saveQuestionsToDB = async (parsedData: ExcelQuestionRow[]) => {
         correctAns: correctAnswer,
         difficulty,
         topicId: topicRecord.id,
+        solution: "", // <-- Add this line, or provide the actual solution if available
       },
     });
   }

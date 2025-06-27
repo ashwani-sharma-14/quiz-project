@@ -3,8 +3,9 @@ import { Request, Response } from "express";
 import { oauth2Client } from "@/config/google.config";
 import bcrypt from "bcrypt";
 import axios from "axios";
-import { generateTokens } from "@/lib/auth";
+import { generateTokens, verifyRefreshToken } from "@/lib/auth";
 import { setAuthCookie } from "@/lib/cookies";
+import { asyncWrap } from "@/utils/asyncWrap";
 
 const signUpUser = async (req: Request, res: Response) => {
   const data = req.body;
@@ -89,9 +90,32 @@ const googleLogin = async (req: Request, res: Response) => {
   return setAuthCookie(res, accessToken, "Login Successful", refreshToken);
 };
 
+const refreshToken = asyncWrap(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies?.refreshToken;
+  if (!refreshToken) {
+    return res.status(401).json({ message: "No refresh token provided" });
+  }
+
+  const decoded = verifyRefreshToken(refreshToken);
+  if (!decoded) {
+    return res.status(401).json({ message: "Invalid refresh token" });
+  }
+
+  const { userId, email } = decoded;
+  const tokens = generateTokens({ userId, email });
+
+  return setAuthCookie(
+    res,
+    tokens.accessToken,
+    "Token refreshed",
+    tokens.refreshToken
+  );
+});
+
 export const userController = {
   signUpUser,
   login,
   googleLogin,
   logout,
+  refreshToken,
 };

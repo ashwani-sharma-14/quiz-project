@@ -7,4 +7,5 @@ userRouter.post("/signup", asyncWrap(userController.signUpUser));
 userRouter.post("/login", asyncWrap(userController.login));
 userRouter.post("/logout", authenticateToken, asyncWrap(userController.logout));
 userRouter.get("/google", asyncWrap(userController.googleLogin));
+userRouter.post("/refresh", asyncWrap(userController.refreshToken));
 export default userRouter;
