@@ -9,8 +9,7 @@ import { asyncWrap } from "@/utils/asyncWrap";
 
 const signUpUser = async (req: Request, res: Response) => {
   const data = req.body;
-  const { password, dob } = data;
-  data.dob = new Date(dob).toISOString();
+  const { password } = data;
   const hashedPassword = await bcrypt.hash(password, 10);
   data.password = hashedPassword;
   const user = await studentService.createUser(data);
@@ -69,7 +68,7 @@ const googleLogin = async (req: Request, res: Response) => {
   );
 
   if (!userRes || !userRes.data) {
-    return res.json({ message: "user not found" }).status(401);
+    return res.json({ success: false, message: "user not found" }).status(401);
   }
 
   const data = userRes.data;
@@ -78,8 +77,12 @@ const googleLogin = async (req: Request, res: Response) => {
 
   if (!user) {
     return res
-      .json({ message: "user not found please sign up", user })
-      .status(200);
+      .json({
+        success: false,
+        message: "user not found please sign up",
+        user: data,
+      })
+      .status(401);
   }
 
   const { accessToken, refreshToken } = generateTokens({

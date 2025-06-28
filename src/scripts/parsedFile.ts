@@ -16,8 +16,15 @@ export const parseExcelData = (
   const [, ...rows] = rawData;
 
   for (const row of rows) {
-    const [category, topic, question, optionsStr, correctAnswer, difficulty] =
-      row;
+    const [
+      category,
+      topic,
+      question,
+      optionsStr,
+      correctAnswer,
+      difficulty,
+      solution,
+    ] = row;
 
     // Check if any required field is missing
     if (
@@ -26,7 +33,8 @@ export const parseExcelData = (
       !question ||
       !optionsStr ||
       !correctAnswer ||
-      !difficulty
+      !difficulty ||
+      !solution
     ) {
       console.warn("Skipping row due to missing fields:", row);
       continue;
@@ -50,6 +58,7 @@ export const parseExcelData = (
       options,
       correctAnswer: correctAnswer.trim(),
       difficulty: difficulty.trim().toUpperCase() as "EASY" | "MEDIUM" | "HARD",
+      
     });
   }
 

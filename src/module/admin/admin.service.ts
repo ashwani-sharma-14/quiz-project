@@ -78,7 +78,6 @@ const getAllUsers = async () => {
       email: true,
       enrollment: true,
       branch: true,
-      department: true,
       admissionYear: true,
       currentYear: true,
     },
