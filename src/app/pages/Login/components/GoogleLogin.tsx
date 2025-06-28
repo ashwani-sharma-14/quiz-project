@@ -1,38 +1,40 @@
 import React from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import api from "@/utils/clientApiInstace";
 import logo from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/useAuthStore";
 
+interface GoogleUser {
+  email: string;
+  family_name: string;
+  given_name: string;
+  hd: string;
+  id: string;
+  name: string;
+  picture: string;
+  verified_email: boolean;
+}
+
+interface UseAuthStore {
+  googlelogin: (
+    code: string,
+    navigate: (path: string) => void
+  ) => Promise<boolean>;
+  googleUser: GoogleUser;
+}
+
+import { useAuthStore } from "@/store/useAuthStore";
 const GoogleLogin: React.FC = () => {
+  const googlelogin = useAuthStore(
+    (state: unknown) => (state as UseAuthStore).googlelogin
+  );
+
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state);
 
   const handleSuccess = async (authResult: { code: string }) => {
-    try {
-      const result = await api.get("/auth/google?code=" + authResult.code);
-
-      if (!result.data.success) {
-        if (result.data.message === "User not found") {
-          navigate("/sign-up", {
-            state: { googleUser: result.data.googleUser },
-          });
-          return;
-        }
-       
-      }
-
-      setAuth.authState = result.data.user;
-      toast.success("Login successful");
-      navigate("/");
-    } catch (err) {
-      console.error("Google login error:", err);
-      toast.error("Google login failed.");
-    }
+    await googlelogin(authResult.code, navigate);
   };
+
 
   const googleLogin = useGoogleLogin({
     onSuccess: handleSuccess,

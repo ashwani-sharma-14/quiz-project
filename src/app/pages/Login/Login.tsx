@@ -8,13 +8,22 @@ import GoogleLogin from "./components/GoogleLogin";
 import { LoginSchema } from "@/schemas/loginSchema";
 import type { SignInData } from "@/schemas/loginSchema";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import logo from "@/assets/logo.jpg";
 import { useAuthStore } from "@/store/useAuthStore";
 
+interface LoginData {
+  email: string;
+  password: string;
+}
+
+interface UseAuthStore {
+  login: (data: LoginData) => Promise<boolean>;
+}
+
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const login = useAuthStore((state) => (state as UseAuthStore).login);
 
   const {
     register,
@@ -31,11 +40,8 @@ const Login: React.FC = () => {
     };
     const success = await login(credentials);
     if (!success) {
-      toast.error("User not found. Please sign up using Google.");
       return;
     }
-
-    toast.success("Login successful");
     navigate("/");
   };
 
