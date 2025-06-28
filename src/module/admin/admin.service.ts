@@ -95,14 +95,31 @@ const getAllQuestions = async () => {
       },
     },
   });
-  return questions;
+
+  const sanitizedQuestions = questions.map(({ topicId, ...rest }) => rest);
+
+  return sanitizedQuestions;
 };
 
-const updateQuestion = async (id: string, data: Prisma.QuestionUpdateInput) => {
+const updateQuestion = async (id: string, data: any) => {
+  const { topic, ...rest } = data;
+
+  const updateData: Prisma.QuestionUpdateInput = {
+    ...rest,
+    ...(topic?.id && {
+      topic: {
+        connect: {
+          id: topic.id,
+        },
+      },
+    }),
+  };
+
   const question = await prisma.question.update({
     where: { id },
-    data,
+    data: updateData,
   });
+
   return question;
 };
 
