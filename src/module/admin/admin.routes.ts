@@ -20,6 +20,6 @@ adminRouter.get("/questions", adminController.getAllQuestions);
 adminRouter.get("/users", adminController.getAllUsers);
 adminRouter.get("/questions/:id", adminController.getAllQuestionsById);
 adminRouter.patch("/questions/:id", adminController.updateQuestion);
-adminRouter.delete("/questions/:id", adminController.updateQuestion);
+adminRouter.delete("/questions/:id", adminController.deleteQuestions);
 
 export default adminRouter;
