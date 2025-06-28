@@ -8,7 +8,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ClipLoader } from "react-spinners";
 import type { Question } from "./QuestionsTable";
+import { useQuestionStore } from "@/store/useQuestionStore";
 
 export interface DeleteQuestionsProp {
   isOpen: boolean;
@@ -23,7 +25,9 @@ const DeleteDialog = ({
   onConfirm,
   question,
 }: DeleteQuestionsProp) => {
+  const loading = useQuestionStore((s) => s.loading);
   if (!question) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
@@ -37,11 +41,15 @@ const DeleteDialog = ({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
-            Delete
+          <Button variant="destructive" onClick={onConfirm} disabled={loading}>
+            {loading ? (
+              <ClipLoader color="white" loading={true} size={20} />
+            ) : (
+              "Delete"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

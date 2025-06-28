@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useQuestionStore } from "@/store/useQuestionStore";
+import { ClipLoader } from "react-spinners";
 // import { Upload } from "lucide-react";
 
 export interface CreateQuestionsProp {
@@ -23,19 +25,29 @@ export interface CreateQuestionsProp {
 const CreateQuestions = ({ isOpen, onClose }: CreateQuestionsProp) => {
   const [file, setFile] = useState<File | null>(null);
 
+  const createQuestionsFromExcel = useQuestionStore(
+    (s) => s.createQuestionsFromExcel
+  );
+  const loading = useQuestionStore((s) => s.loading);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
-    setFile(selectedFile);
+    setFile(selectedFile); 
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) {
       alert("Please select an Excel file first.");
       return;
     }
+    
+  
+    await createQuestionsFromExcel(file);
+    onClose();
+    setFile(null);
+    
 
-    // TODO: Upload logic here
-    alert(`Uploading: ${file.name}`);
+    
   };
 
   return (
@@ -58,7 +70,7 @@ const CreateQuestions = ({ isOpen, onClose }: CreateQuestionsProp) => {
         </div>
 
         <DialogFooter>
-          <Button onClick={handleUpload}>Upload</Button>
+          <Button onClick={handleUpload}>{loading? <ClipLoader color="white" loading={true} size={30} /> : "Upload"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -17,7 +17,7 @@ interface Student {
   id: string;
   name: string;
   email: string;
-  role: string;
+  branch: string;
 }
 
 const ROWS_PER_PAGE = 10;
@@ -60,7 +60,7 @@ const StudentsTable = () => {
               <TableHead className="text-center">S.No</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
+              <TableHead>Branch</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -78,7 +78,7 @@ const StudentsTable = () => {
                   </TableCell>
                   <TableCell>{student.name}</TableCell>
                   <TableCell>{student.email}</TableCell>
-                  <TableCell>{student.role}</TableCell>
+                  <TableCell>{student.branch}</TableCell>
                 </TableRow>
               ))
             ) : (

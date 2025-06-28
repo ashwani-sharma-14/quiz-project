@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import  { useState, useEffect } from "react";
 import type { Question } from "./QuestionsTable";
 
 export interface EditQuestionsProp {
@@ -25,13 +25,36 @@ const EditDialog = ({
   question,
   onSave,
 }: EditQuestionsProp) => {
-  const [edited, setEdited] = useState<Question>(question);
+  const normalizeOptions = (opts: Question["options"]) => {
+    const keys = ["A", "B", "C", "D"];
+    const entries = keys.map((k) => [k, opts[k] || opts[k.toLowerCase()] || ""]);
+    return Object.fromEntries(entries) as Record<"A" | "B" | "C" | "D", string>;
+  };
 
-  // Keep local state in sync if question changes
-  // (e.g. when switching between questions)
-  React.useEffect(() => {
-    setEdited(question);
+  const [editedQuestion, setEditedQuestion] = useState<string>(question.question);
+  const [options, setOptions] = useState<Record<"A" | "B" | "C" | "D", string>>(
+    normalizeOptions(question.options)
+  );
+  const [correctAnswer, setCorrectAnswer] = useState<string>(
+    question.correctAns
+  );
+
+  useEffect(() => {
+    setEditedQuestion(question.question);
+    setOptions(normalizeOptions(question.options));
+    setCorrectAnswer(question.correctAns);
   }, [question]);
+
+  const handleSave = () => {
+    const updated= {
+      ...question,
+      question: editedQuestion,
+      options,
+      correctAns: correctAnswer,
+    };
+    onSave(updated);
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -41,46 +64,40 @@ const EditDialog = ({
         </DialogHeader>
         <div className="space-y-3">
           <Input
-            value={edited.question}
-            onChange={(e) => setEdited({ ...edited, question: e.target.value })}
+            value={editedQuestion}
+            onChange={(e) => setEditedQuestion(e.target.value)}
             placeholder="Edit question"
           />
           <div className="grid grid-cols-1 gap-2">
-            {(["a", "b", "c", "d"] as const).map((key) => (
+            {(["A", "B", "C", "D"] as const).map((key) => (
               <div key={key} className="flex items-center gap-2">
-                <span className="font-mono w-4">{key.toUpperCase()}.</span>
+                <span className="font-mono w-4">{key}.</span>
                 <Input
-                  value={edited.options[key]}
+                  value={options[key]}
                   onChange={(e) =>
-                    setEdited({
-                      ...edited,
-                      options: { ...edited.options, [key]: e.target.value },
-                    })
+                    setOptions({ ...options, [key]: e.target.value })
                   }
-                  placeholder={`Option ${key.toUpperCase()}`}
+                  placeholder={`Option ${key}`}
                 />
                 <input
                   type="radio"
                   name="correctAns"
-                  checked={edited.correctAns.toLowerCase() === key}
-                  onChange={() => setEdited({ ...edited, correctAns: key })}
+                  checked={
+                    correctAnswer.toLowerCase() === options[key].toLowerCase()
+                  }
+                  value={key}
+                  onChange={() => setCorrectAnswer(options[key])}
                   className="ml-2"
-                  aria-label={`Mark ${key.toUpperCase()} as correct`}
+                  aria-label={`Mark ${key} as correct`}
                 />
+
                 <span className="text-xs text-muted-foreground">Correct</span>
               </div>
             ))}
           </div>
         </div>
         <DialogFooter>
-          <Button
-            onClick={() => {
-              onSave(edited);
-              onClose();
-            }}
-          >
-            Save
-          </Button>
+          <Button onClick={handleSave}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

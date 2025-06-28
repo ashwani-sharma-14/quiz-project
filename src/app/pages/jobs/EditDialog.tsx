@@ -126,7 +126,7 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
     setUpdating(true);
     try {
       const updatedJob: Job = { ...job, ...values };
-      console.log("Updated Job:", updatedJob);
+     
       const success = await updateJob(job.id, updatedJob);
       if (success) {
         toast.success("Job updated successfully");
@@ -146,7 +146,7 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl overflow-y-auto max-h-[90vh] "> 
+      <DialogContent className="max-w-2xl overflow-y-auto max-h-[90vh] hide-scrollbar "> 
         <DialogHeader>
           <DialogTitle>Edit Job</DialogTitle>
         </DialogHeader>

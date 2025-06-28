@@ -232,9 +232,7 @@ const JobTable = () => {
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         job={selectedQuestion}
-        onConfirm={() => {
-          console.log("Deleted:", selectedQuestion);
-        }}
+        
       />
     </div>
   );

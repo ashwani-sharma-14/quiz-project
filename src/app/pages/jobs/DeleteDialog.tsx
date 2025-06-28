@@ -20,14 +20,12 @@ interface JobStore {
 export interface DeleteJobDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (id: string) => void;
   job: Job | null;
 }
 
 const DeleteDialog = ({
   isOpen,
   onClose,
-  onConfirm,
   job,
 }: DeleteJobDialogProps) => {
   const { deleteJob } = useJobStore((state: unknown) => state as JobStore);
@@ -36,7 +34,6 @@ const DeleteDialog = ({
     try {
       const success = await deleteJob(id);
       if (success) {
-        onConfirm(id);
         window.location.reload();
         toast.success("Job deleted successfully");
       } else {
@@ -65,7 +62,6 @@ const DeleteDialog = ({
             variant="destructive"
             onClick={() => {
               handleDelete(job.id);
-              onConfirm(job.id);
               onClose();
             }}
           >

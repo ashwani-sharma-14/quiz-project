@@ -16,7 +16,6 @@ export const useAuthStore = create((set) => ({
   login: async (data: Data) => {
     try {
       const response = await api.post("/admin/login", data);
-      console.log(response);
       if (response.data.success) {
         set({ loggedIn: true });
       }

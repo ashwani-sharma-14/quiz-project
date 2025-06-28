@@ -13,10 +13,11 @@ interface Job {
 export const useJobStore = create((set) => ({
   jobs: [],
   logo: "",
+  
   alljobs: async () => {
     try {
       const response = await api.get("/jobs");
-      console.log(response);
+    
       if (response.data.success) {
         set({ jobs: response.data.jobs });
       } else {
@@ -54,7 +55,7 @@ export const useJobStore = create((set) => ({
   createJob: async (data: Job) => {
     try {
       const response = await api.post("/jobs/newjob", data);
-      console.log(response);
+
       if (response.data.success) {
         window.location.reload();
         toast.success("Job created successfully");
@@ -75,8 +76,8 @@ export const useJobStore = create((set) => ({
 
       const response = await api.post("/jobs/uploadlogo", formData);
       if (response.data.success) {
-        set({ logo: response.data.logo });
-        console.log(response.data.logo);
+          set({ logo: response.data.logo });
+        
         toast.success("Logo uploaded successfully");
         return true;
       } else {

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Menu, X, Home, Briefcase, HelpCircle } from "lucide-react";
+import { Menu, X, Home, Briefcase, HelpCircle, UserCircle } from "lucide-react";
 
 const sidebarLinks = [
   { label: "Dashboard", href: "/dashboard", icon: <Home size={18} /> },
   { label: "Jobs", href: "/jobs", icon: <Briefcase size={18} /> },
   { label: "Questions", href: "/questions", icon: <HelpCircle size={18} /> },
+  { label: "Students", href: "/students", icon: <UserCircle size={18} /> },
 ];
 
 const CustomSidebar: React.FC<{ children: React.ReactNode }> = ({

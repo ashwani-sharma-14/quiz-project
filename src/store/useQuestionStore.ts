@@ -7,9 +7,11 @@ interface QuestionStore {
   questions: Question[];
   loading: boolean;
   error: string | null;
+
+  createQuestionsFromExcel: (file: File) => Promise<boolean>;
   fetchQuestions: () => Promise<void>;
   fetchQuestionById: (id: string) => Promise<Question | null>;
-  updateQuestion: (id: string, data: Partial<Question>) => Promise<boolean>;
+  updateQuestion: (id: string, data: Question) => Promise<boolean>;
   deleteQuestion: (id: string) => Promise<boolean>;
 }
 
@@ -18,17 +20,48 @@ export const useQuestionStore = create<QuestionStore>((set, get) => ({
   loading: false,
   error: null,
 
+  createQuestionsFromExcel: async (file: File): Promise<boolean> => {
+    set({ loading: true, error: null });
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await api.post("/admin/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data.message === "File uploaded successfully") {
+        toast.success("Questions imported successfully");
+        await get().fetchQuestions();
+        set({ loading: false });
+        return true;
+      } else {
+        toast.error("Failed to import questions");
+        set({ loading: false });
+        return false;
+      }
+    } catch (err: unknown) {
+      let errorMessage = "Failed to import questions";
+      if (err instanceof Error) errorMessage = err.message;
+
+      toast.error(errorMessage);
+      set({ error: errorMessage, loading: false });
+      return false;
+    }
+  },
+
   fetchQuestions: async () => {
     set({ loading: true, error: null });
     try {
       const res = await api.get("/admin/questions");
+    
       set({ questions: res.data.questions, loading: false });
-    } catch (err: any) {
-      set({
-        error: err.message || "Failed to fetch questions",
-        loading: false,
-      });
-      toast.error("Failed to fetch questions");
+    } catch (err: unknown) {
+      let errorMessage = "Failed to fetch questions";
+      if (err instanceof Error) errorMessage = err.message;
+
+      toast.error(errorMessage);
+      set({ error: errorMessage, loading: false });
     }
   },
 
@@ -38,21 +71,25 @@ export const useQuestionStore = create<QuestionStore>((set, get) => ({
       const res = await api.get(`/admin/questions/${id}`);
       set({ loading: false });
       return res.data.question as Question;
-    } catch (err: any) {
-      set({ error: err.message || "Failed to fetch question", loading: false });
-      toast.error("Failed to fetch question");
+    } catch (err: unknown) {
+      let errorMessage = "Failed to fetch question";
+      if (err instanceof Error) errorMessage = err.message;
+
+      toast.error(errorMessage);
+      set({ error: errorMessage, loading: false });
       return null;
     }
   },
 
-  updateQuestion: async (id: string, data: Partial<Question>) => {
+  updateQuestion: async (id: string, data: Question) => {
     set({ loading: true, error: null });
     try {
+   
       const res = await api.patch(`/admin/questions/${id}`, data);
+
       if (res.data.success) {
         toast.success("Question updated successfully");
-        // Optionally refetch questions
-        get().fetchQuestions();
+        await get().fetchQuestions();
         set({ loading: false });
         return true;
       } else {
@@ -60,24 +97,25 @@ export const useQuestionStore = create<QuestionStore>((set, get) => ({
         set({ loading: false });
         return false;
       }
-    } catch (err: any) {
-      set({
-        error: err.message || "Failed to update question",
-        loading: false,
-      });
-      toast.error("Failed to update question");
+    } catch (err: unknown) {
+      let errorMessage = "Failed to update question";
+      if (err instanceof Error) errorMessage = err.message;
+
+      toast.error(errorMessage);
+      set({ error: errorMessage, loading: false });
       return false;
     }
   },
 
   deleteQuestion: async (id: string) => {
+
     set({ loading: true, error: null });
     try {
       const res = await api.delete(`/admin/questions/${id}`);
+
       if (res.data.success) {
         toast.success("Question deleted successfully");
-        // Optionally refetch questions
-        get().fetchQuestions();
+        await get().fetchQuestions();
         set({ loading: false });
         return true;
       } else {
@@ -85,12 +123,12 @@ export const useQuestionStore = create<QuestionStore>((set, get) => ({
         set({ loading: false });
         return false;
       }
-    } catch (err: any) {
-      set({
-        error: err.message || "Failed to delete question",
-        loading: false,
-      });
-      toast.error("Failed to delete question");
+    } catch (err: unknown) {
+      let errorMessage = "Failed to delete question";
+      if (err instanceof Error) errorMessage = err.message;
+
+      toast.error(errorMessage);
+      set({ error: errorMessage, loading: false });
       return false;
     }
   },

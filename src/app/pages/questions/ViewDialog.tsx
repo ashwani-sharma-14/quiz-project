@@ -11,11 +11,17 @@ import type { Question } from "./QuestionsTable";
 export interface ViewQuestionsProp {
   isOpen: boolean;
   onClose: () => void;
-  question: Question;
+  data: {
+    question: Question; 
+    correctAns: string;
+  };
 }
 
-const ViewDialog = ({ isOpen, onClose, question }: ViewQuestionsProp) => {
-  if (!question) return null;
+const ViewDialog = ({ isOpen, onClose, data }: ViewQuestionsProp) => {
+
+  const correctAnswer = data.correctAns;
+
+  const question = data.question;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -30,15 +36,20 @@ const ViewDialog = ({ isOpen, onClose, question }: ViewQuestionsProp) => {
               <div
                 key={key}
                 className={
-                  key.toLowerCase() === question.correctAns.toLowerCase()
+                  key.toLowerCase() === correctAnswer.toLowerCase()
                     ? "font-bold text-green-600"
                     : ""
                 }
               >
+                
                 <span className="font-mono mr-2">{key.toUpperCase()}.</span>
                 {value}
               </div>
             ))}
+          </div>
+          <div className="mt-4">
+            <span className="font-semibold">Correct Answer: </span>
+            <span className="text-green-600">{correctAnswer.toLowerCase()}</span>
           </div>
         </div>
       </DialogContent>

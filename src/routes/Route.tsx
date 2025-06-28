@@ -11,18 +11,29 @@ const LoginPage = lazy(() => import("@/app/pages/auth/Login"));
 const QuestionPage = lazy(() => import("@/app/pages/questions/QuestionsTable"));
 const JobsPage = lazy(() => import("@/app/pages/jobs/JobsTable"));
 const Dashboard = lazy(() => import("@/app/pages/dashboard/Dashboard"));
+const Student= lazy(() => import("@/app/pages/students/StudentsTable"));
 const Routes = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
         <Route
-          path="/login"
+          path="/"
           element={
-            <BaseLayout>
+           
               <Suspense fallback={<div>Loading.....</div>}>
                 <LoginPage></LoginPage>
               </Suspense>
-            </BaseLayout>
+           
+          }
+        />
+        <Route
+          path="/login"
+          element={
+          
+              <Suspense fallback={<div>Loading.....</div>}>
+                <LoginPage></LoginPage>
+              </Suspense>
+           
           }
         />
         <Route
@@ -51,6 +62,16 @@ const Routes = () => {
             <BaseLayout>
               <Suspense>
                 <JobsPage />
+              </Suspense>
+            </BaseLayout>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <BaseLayout>
+              <Suspense>
+                <Student />
               </Suspense>
             </BaseLayout>
           }

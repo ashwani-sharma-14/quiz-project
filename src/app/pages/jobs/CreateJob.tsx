@@ -34,13 +34,19 @@ interface JobStore {
 
 const jobSchema = z.object({
   jobTitle: z.string().min(1, { message: "Job title is required" }),
-  jobDescription: z.string().min(1, { message: "Job description is required" }),
+  jobDescription: z
+    .string()
+    .transform((val) => val.replace(/<[^>]*>/g, "").trim()) // ⬅ strip tags
+    .refine((val) => val.length > 0, {
+      message: "Job description is required",
+    }),
   companyName: z.string().min(1, { message: "Company name is required" }),
   applyLink: z.string().url({ message: "Valid apply link is required" }),
   package: z.string().optional(),
   logo: z.string().min(1, { message: "Logo URL is required" }),
   location: z.string().min(1, { message: "Location is required" }),
 });
+
 
 type JobFormValues = z.infer<typeof jobSchema>;
 
@@ -78,9 +84,8 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
     try {
       const success = await uploadLogo(file);
       if (success) {
-        const Newlogo = (useJobStore.getState() as JobStore).logo;
-        form.setValue("logo", Newlogo);
-        console.log(Newlogo);
+        const newLogo = (useJobStore.getState() as JobStore).logo;
+        form.setValue("logo", newLogo);
         toast.success("Logo uploaded");
       } else {
         toast.error("Failed to upload logo");
@@ -96,12 +101,11 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
     setSubmitting(true);
     try {
       const success = await createJob(values);
-      console.log(success);
       if (success) {
         onSuccess();
         onClose();
-        form.reset(); // Reset the form first
-        window.location.reload(); // Then reload the page
+        form.reset(); // Reset form fields
+        window.location.reload(); // Reload job list
       } else {
         toast.error("Failed to create job");
       }
@@ -114,7 +118,7 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md overflow-y-auto max-h-[90vh]">
+      <DialogContent className="sm:max-w-md overflow-y-auto max-h-[90vh] hide-scrollbar">
         <DialogHeader>
           <DialogTitle>Create Job</DialogTitle>
           <DialogDescription>
@@ -136,6 +140,9 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
                 </FormItem>
               )}
             />
+            
+
+            {/* ✅ Properly bound RichTextEditor */}
             <FormField
               control={form.control}
               name="jobDescription"
@@ -152,6 +159,7 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="companyName"
@@ -165,6 +173,7 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="applyLink"
@@ -178,6 +187,7 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="package"
@@ -191,6 +201,7 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="location"
@@ -198,12 +209,13 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
                 <FormItem>
                   <FormLabel>Job Location</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter Job Location" {...field} />
+                    <Input placeholder="Enter job location" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="logo"
@@ -240,6 +252,7 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
                 </FormItem>
               )}
             />
+
             <DialogFooter>
               <Button
                 type="button"
