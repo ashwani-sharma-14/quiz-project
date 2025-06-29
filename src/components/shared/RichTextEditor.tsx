@@ -272,7 +272,7 @@ function EditorContent({
     });
 
     hasInitialized.current = true;
-  }, [value, editor]);
+  }, [value, editor, hasInitialized]);
 
   return (
     <div className="space-y-4">

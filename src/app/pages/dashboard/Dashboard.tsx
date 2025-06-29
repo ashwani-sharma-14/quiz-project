@@ -11,7 +11,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [fetchDashboardData]);
 
   const renderCard = (
     title: string,
@@ -34,7 +34,6 @@ const Dashboard = () => {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-
       {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

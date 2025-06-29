@@ -117,159 +117,160 @@ const CreateJob = ({ isOpen, onClose, onSuccess }: CreateQuestionsProp) => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md overflow-y-auto max-h-[90vh] hide-scrollbar">
-        <DialogHeader>
-          <DialogTitle>Create Job</DialogTitle>
-          <DialogDescription>
-            Fill in the details to create a new job entry.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="jobTitle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter job title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
+ <Dialog open={isOpen} onOpenChange={onClose}>
+  <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto hide-scrollbar rounded-2xl">
+    <DialogHeader>
+      <DialogTitle className="text-lg font-semibold">Create Job</DialogTitle>
+      <DialogDescription>Fill in the details to post a new job opening.</DialogDescription>
+    </DialogHeader>
 
-            {/* ✅ Properly bound RichTextEditor */}
-            <FormField
-              control={form.control}
-              name="jobDescription"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Description</FormLabel>
-                  <FormControl>
-                    <RichTextEditor
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        {/* Job Title */}
+        <FormField
+          control={form.control}
+          name="jobTitle"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter job title" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="companyName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Company Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter company name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* Job Description */}
+        <FormField
+          control={form.control}
+          name="jobDescription"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Description</FormLabel>
+              <FormControl>
+                <RichTextEditor value={field.value} onChange={field.onChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="applyLink"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Apply Link</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter apply link (URL)" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* Company Name */}
+        <FormField
+          control={form.control}
+          name="companyName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter company name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="package"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Package</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter package (optional)" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* Apply Link */}
+        <FormField
+          control={form.control}
+          name="applyLink"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Apply Link</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter apply link (URL)" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter job location" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* Package */}
+        <FormField
+          control={form.control}
+          name="package"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Package</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter package (optional)" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="logo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Logo</FormLabel>
-                  <FormControl>
-                    <div>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        ref={fileInputRef}
-                        onChange={handleLogoChange}
-                        disabled={uploading}
+        {/* Location */}
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Location</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter job location" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Logo Upload */}
+        <FormField
+          control={form.control}
+          name="logo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company Logo</FormLabel>
+              <FormControl>
+                <div>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleLogoChange}
+                    disabled={uploading}
+                  />
+                  {form.watch("logo") && (
+                    <div className="mt-2">
+                      <img
+                        src={form.watch("logo")}
+                        alt="Logo Preview"
+                        className="h-12 object-contain rounded-md"
                       />
-                      {form.watch("logo") && (
-                        <div className="mt-2">
-                          <img
-                            src={form.watch("logo")}
-                            alt="Logo Preview"
-                            className="h-12 object-contain"
-                          />
-                        </div>
-                      )}
-                      <input type="hidden" {...field} />
-                      {uploading && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Uploading...
-                        </div>
-                      )}
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  )}
+                  <input type="hidden" {...field} />
+                  {uploading && (
+                    <p className="text-xs text-muted-foreground mt-1">Uploading...</p>
+                  )}
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={submitting || uploading}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={submitting || uploading}>
-                {submitting ? "Submitting..." : "Submit"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        {/* Footer Buttons */}
+        <DialogFooter className="pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={submitting || uploading}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={submitting || uploading}>
+            {submitting ? "Submitting..." : "Submit"}
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  </DialogContent>
+</Dialog>
+
   );
 };
 

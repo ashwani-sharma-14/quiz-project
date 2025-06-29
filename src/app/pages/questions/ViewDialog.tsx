@@ -24,36 +24,49 @@ const ViewDialog = ({ isOpen, onClose, data }: ViewQuestionsProp) => {
   const question = data.question;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>View Question</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-2">
-          <div className="font-semibold">{question.question}</div>
-          <div className="space-y-1">
-            {Object.entries(question.options).map(([key, value]) => (
-              <div
-                key={key}
-                className={
-                  key.toLowerCase() === correctAnswer.toLowerCase()
-                    ? "font-bold text-green-600"
-                    : ""
-                }
-              >
-                
-                <span className="font-mono mr-2">{key.toUpperCase()}.</span>
-                {value}
-              </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <span className="font-semibold">Correct Answer: </span>
-            <span className="text-green-600">{correctAnswer.toLowerCase()}</span>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+  <Dialog open={isOpen} onOpenChange={onClose}>
+  <DialogContent className="sm:max-w-lg rounded-2xl">
+    <DialogHeader>
+      <DialogTitle className="text-lg font-semibold">Detailed Question</DialogTitle>
+    </DialogHeader>
+
+    <div className="space-y-4 mt-2">
+      <div className="bg-muted p-4 rounded-lg text-base font-medium">
+        {question.question}
+      </div>
+
+      <div className="space-y-2">
+        {Object.entries(question.options).map(([key, value]) => {
+          const isCorrect =
+            key.toLowerCase() === correctAnswer.toLowerCase();
+          return (
+            <div
+              key={key}
+              className={`flex items-start gap-2 text-sm p-2 rounded-md ${
+                isCorrect
+                  ? "bg-green-50 text-green-700 font-semibold border border-green-300"
+                  : "bg-muted/40"
+              }`}
+            >
+              <span className="font-mono text-muted-foreground">
+                {key.toUpperCase()}.
+              </span>
+              <span>{value}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="pt-2 text-sm">
+        <span className="font-medium">Correct Answer: </span>
+        <span className="text-green-600 uppercase">
+          {correctAnswer.toLowerCase()}
+        </span>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
+
   );
 };
 

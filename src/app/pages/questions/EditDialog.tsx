@@ -57,28 +57,44 @@ const EditDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Question</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-3">
-          <Input
-            value={editedQuestion}
-            onChange={(e) => setEditedQuestion(e.target.value)}
-            placeholder="Edit question"
-          />
-          <div className="grid grid-cols-1 gap-2">
-            {(["A", "B", "C", "D"] as const).map((key) => (
-              <div key={key} className="flex items-center gap-2">
-                <span className="font-mono w-4">{key}.</span>
-                <Input
-                  value={options[key]}
-                  onChange={(e) =>
-                    setOptions({ ...options, [key]: e.target.value })
-                  }
-                  placeholder={`Option ${key}`}
-                />
+<Dialog open={isOpen} onOpenChange={onClose}>
+  <DialogContent className="sm:max-w-lg rounded-2xl">
+    <DialogHeader>
+      <DialogTitle className="text-lg font-semibold">Edit Question</DialogTitle>
+    </DialogHeader>
+
+    <div className="space-y-4 mt-2">
+      <div>
+        <label className="text-sm font-medium text-muted-foreground block mb-1">
+          Question
+        </label>
+        <Input
+          value={editedQuestion}
+          onChange={(e) => setEditedQuestion(e.target.value)}
+          placeholder="Edit question"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-muted-foreground block mb-2">
+          Options (Select the correct one)
+        </label>
+        <div className="grid gap-3">
+          {(["A", "B", "C", "D"] as const).map((key) => (
+            <div
+              key={key}
+              className="flex items-center gap-3 bg-muted p-2 rounded-md border"
+            >
+              <span className="font-bold text-sm w-4">{key}</span>
+              <Input
+                value={options[key]}
+                onChange={(e) =>
+                  setOptions({ ...options, [key]: e.target.value })
+                }
+                placeholder={`Option ${key}`}
+                className="flex-1"
+              />
+              <div className="flex items-center gap-1">
                 <input
                   type="radio"
                   name="correctAns"
@@ -87,20 +103,25 @@ const EditDialog = ({
                   }
                   value={key}
                   onChange={() => setCorrectAnswer(options[key])}
-                  className="ml-2"
-                  aria-label={`Mark ${key} as correct`}
+                  className="accent-primary"
                 />
-
                 <span className="text-xs text-muted-foreground">Correct</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-        <DialogFooter>
-          <Button onClick={handleSave}>Save</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
+
+    <DialogFooter className="mt-4">
+      <Button variant="outline" onClick={onClose}>
+        Cancel
+      </Button>
+      <Button onClick={handleSave}>Save Changes</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
   );
 };
 

@@ -126,7 +126,7 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
     setUpdating(true);
     try {
       const updatedJob: Job = { ...job, ...values };
-     
+
       const success = await updateJob(job.id, updatedJob);
       if (success) {
         toast.success("Job updated successfully");
@@ -146,12 +146,17 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl overflow-y-auto max-h-[90vh] hide-scrollbar "> 
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl hide-scrollbar">
         <DialogHeader>
-          <DialogTitle>Edit Job</DialogTitle>
+          <DialogTitle className="text-xl font-bold">Edit Job</DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 pt-2"
+          >
+            {/* Job Title */}
             <FormField
               control={form.control}
               name="jobTitle"
@@ -165,6 +170,8 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                 </FormItem>
               )}
             />
+
+            {/* Description */}
             <FormField
               control={form.control}
               name="jobDescription"
@@ -181,6 +188,8 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                 </FormItem>
               )}
             />
+
+            {/* Company Name */}
             <FormField
               control={form.control}
               name="companyName"
@@ -194,6 +203,8 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                 </FormItem>
               )}
             />
+
+            {/* Apply Link */}
             <FormField
               control={form.control}
               name="applyLink"
@@ -207,6 +218,8 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                 </FormItem>
               )}
             />
+
+            {/* Package */}
             <FormField
               control={form.control}
               name="package"
@@ -220,6 +233,8 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                 </FormItem>
               )}
             />
+
+            {/* Logo Upload */}
             <FormField
               control={form.control}
               name="logo"
@@ -227,7 +242,7 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                 <FormItem>
                   <FormLabel>Logo</FormLabel>
                   <FormControl>
-                    <div>
+                    <div className="space-y-2">
                       <Input
                         type="file"
                         accept="image/*"
@@ -236,19 +251,17 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                         disabled={uploading}
                       />
                       {form.watch("logo") && (
-                        <div className="mt-2">
-                          <img
-                            src={form.watch("logo")}
-                            alt="Logo Preview"
-                            className="h-12 object-contain"
-                          />
-                        </div>
+                        <img
+                          src={form.watch("logo")}
+                          alt="Logo Preview"
+                          className="h-12 object-contain border rounded"
+                        />
                       )}
                       <input type="hidden" {...field} />
                       {uploading && (
-                        <div className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground">
                           Uploading...
-                        </div>
+                        </p>
                       )}
                     </div>
                   </FormControl>
@@ -256,7 +269,9 @@ const EditDialog = ({ isOpen, onClose, onSave, job }: EditJobDialogProps) => {
                 </FormItem>
               )}
             />
-            <DialogFooter>
+
+            {/* Footer */}
+            <DialogFooter className="pt-2">
               <Button type="submit" disabled={updating || uploading}>
                 {updating ? "Saving..." : "Save"}
               </Button>

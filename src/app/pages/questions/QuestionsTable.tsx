@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { Loader2, MoreHorizontal, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import CreateQuestions from "./CreateQuestions";
 import { toast } from "sonner";
@@ -53,28 +53,37 @@ const QuestionsTable = () => {
   const fetchQuestions = useQuestionStore((s) => s.fetchQuestions);
   const updateQuestion = useQuestionStore((s) => s.updateQuestion);
   const deleteQuestion = useQuestionStore((s) => s.deleteQuestion);
+  const data = useQuestionStore((s) => s.questions);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
-    null
-  );
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [filter, setFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const data = useQuestionStore((s) => s.questions);
+  const [loading, setLoading] = useState(true);
+  const [delayPassed, setDelayPassed] = useState(false);
 
   useEffect(() => {
-    fetchQuestions();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      setDelayPassed(true);
+    }, 3000); // Delay for toast
+
+    fetchQuestions()
+      .finally(() => {
+        setLoading(false);
+        clearTimeout(timeoutId);
+      });
+  }, [fetchQuestions]);
 
   useEffect(() => {
-    if (data.length === 0) {
+    if (!loading && data.length === 0 && delayPassed) {
       toast.info("No questions available. Please upload some.");
     } else {
       toast.dismiss();
     }
-  }, [data]);
+  }, [loading, data, delayPassed]);
 
   const getOption = (options: Record<string, string>, key: string) => {
     const lowerKey = key.toLowerCase();
@@ -126,105 +135,134 @@ const QuestionsTable = () => {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-8 p-6">
+      {/* Header: Search + New Question */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Input
           placeholder="Search questions..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full sm:w-1/2"
+          className="w-full sm:w-1/2 rounded-xl"
         />
         <Button
           onClick={() => setIsDialogOpen(true)}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto rounded-xl shadow"
         >
-          <Plus className="mr-2 h-4 w-4" /> New Questions
+          <Plus className="mr-2 h-4 w-4" />
+          New Question
         </Button>
       </div>
 
-      <div className="rounded-xl border shadow-sm overflow-x-auto">
-        <Table>
-          <TableCaption className="text-muted-foreground text-sm">
-            The total list of questions
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-center">S.No</TableHead>
-              <TableHead>Topic</TableHead>
-              <TableHead>Question</TableHead>
-              <TableHead>Option A</TableHead>
-              <TableHead>Option B</TableHead>
-              <TableHead>Option C</TableHead>
-              <TableHead>Option D</TableHead>
-              <TableHead>Correct</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedQuestions.map((q, index) => (
-              <TableRow key={q.id}>
-                <TableCell className="text-center">
-                  {(currentPage - 1) * ROWS_PER_PAGE + index + 1}
-                </TableCell>
-                <TableCell>{q.topic?.name}</TableCell>
-                <TableCell>
-                  {q.question.length > 40
-                    ? `${q.question.substring(0, 40)}...`
-                    : q.question}
-                </TableCell>
-                <TableCell>{getOption(q.options, "a")}</TableCell>
-                <TableCell>{getOption(q.options, "b")}</TableCell>
-                <TableCell>{getOption(q.options, "c")}</TableCell>
-                <TableCell>{getOption(q.options, "d")}</TableCell>
-                <TableCell>{q.correctAns ?? "-"}</TableCell>
-                <TableCell className="text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-5 w-5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-32">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedQuestion(q);
-                          setViewOpen(true);
-                        }}
-                      >
-                        View
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedQuestion(q);
-                          setEditOpen(true);
-                        }}
-                      >
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => {
-                          setSelectedQuestion(q);
-                          setDeleteOpen(true);
-                        }}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      {/* Loading Spinner */}
+      {loading ? (
+        <div className="flex items-center justify-center min-h-[60vh] w-full">
+          <Loader2 className="animate-spin h-8 w-8 text-muted-foreground" />
+        </div>
+      ) : (
+        <>
+          {/* Questions Table */}
+          <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+            <Table>
+              <TableCaption className="text-sm text-muted-foreground p-2">
+                Full list of uploaded questions
+              </TableCaption>
+              <TableHeader className="bg-gray-100">
+                <TableRow>
+                  <TableHead className="text-center w-12">#</TableHead>
+                  <TableHead>Topic</TableHead>
+                  <TableHead>Question</TableHead>
+                  <TableHead>Option A</TableHead>
+                  <TableHead>Option B</TableHead>
+                  <TableHead>Option C</TableHead>
+                  <TableHead>Option D</TableHead>
+                  <TableHead>Correct</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedQuestions.length > 0 ? (
+                  paginatedQuestions.map((q, index) => (
+                    <TableRow
+                      key={q.id}
+                      className="hover:bg-gray-50 transition-colors duration-150"
+                    >
+                      <TableCell className="text-center font-medium">
+                        {(currentPage - 1) * ROWS_PER_PAGE + index + 1}
+                      </TableCell>
+                      <TableCell>{q.topic?.name || "-"}</TableCell>
+                      <TableCell title={q.question}>
+                        {q.question.length > 40
+                          ? `${q.question.substring(0, 40)}...`
+                          : q.question}
+                      </TableCell>
+                      <TableCell>{getOption(q.options, "a")}</TableCell>
+                      <TableCell>{getOption(q.options, "b")}</TableCell>
+                      <TableCell>{getOption(q.options, "c")}</TableCell>
+                      <TableCell>{getOption(q.options, "d")}</TableCell>
+                      <TableCell className="font-semibold text-green-600">
+                        {q.correctAns || "-"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-5 w-5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-36">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedQuestion(q);
+                                setViewOpen(true);
+                              }}
+                            >
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedQuestion(q);
+                                setEditOpen(true);
+                              }}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => {
+                                setSelectedQuestion(q);
+                                setDeleteOpen(true);
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-6 text-gray-500">
+                      No questions found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-      <CustomPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+          {/* Pagination */}
+          <div className="flex justify-center">
+            <CustomPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        </>
+      )}
 
+      {/* Dialogs */}
       <CreateQuestions
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}

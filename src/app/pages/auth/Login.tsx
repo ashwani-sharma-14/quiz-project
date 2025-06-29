@@ -21,14 +21,17 @@ import { Button } from "@/components/ui/button";
 import type { LoginSchema } from "@/schemas/loginSchema";
 import { loginSchema } from "@/schemas/loginSchema";
 import { useAuthStore } from "@/store/useAuthStore";
+
 interface AuthStore {
   login: (data: LoginSchema) => Promise<boolean>;
 }
+
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuthStore<AuthStore>(
     (state: unknown) => state as AuthStore
   );
+
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -45,16 +48,20 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-sm shadow-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your credentials to continue</CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
+      <Card className="w-full max-w-md p-6 rounded-2xl shadow-lg border border-gray-200 bg-white">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-semibold tracking-tight">
+            Welcome To Admin Panel
+          </CardTitle>
+          <CardDescription className="text-muted-foreground text-sm">
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={form.control}
                 name="email"
@@ -62,7 +69,12 @@ const Login = () => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="you@example.com"
+                        className="rounded-xl"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -79,6 +91,7 @@ const Login = () => {
                       <Input
                         type="password"
                         placeholder="••••••••"
+                        className="rounded-xl"
                         {...field}
                       />
                     </FormControl>
@@ -87,7 +100,7 @@ const Login = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full rounded-xl">
                 Log In
               </Button>
             </form>

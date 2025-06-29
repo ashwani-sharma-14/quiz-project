@@ -45,31 +45,35 @@ const DeleteDialog = ({
   };
   if (!job) return null;
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirm Delete</DialogTitle>
-        </DialogHeader>
-        <p className="text-sm text-muted-foreground">
-          Are you sure you want to delete the job{" "}
-          <span className="font-semibold">{job.jobTitle}</span>?
-        </p>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              handleDelete(job.id);
-              onClose();
-            }}
-          >
-            Delete
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+ <Dialog open={isOpen} onOpenChange={onClose}>
+  <DialogContent className="sm:max-w-sm rounded-2xl">
+    <DialogHeader>
+      <DialogTitle className="text-lg font-semibold">Confirm Deletion</DialogTitle>
+    </DialogHeader>
+
+    <div className="text-sm text-muted-foreground">
+      Are you sure you want to delete the job post{" "}
+      <span className="text-foreground font-medium">{job.jobTitle}</span>?
+      This action cannot be undone.
+    </div>
+
+    <DialogFooter className="pt-4">
+      <Button variant="outline" onClick={onClose}>
+        Cancel
+      </Button>
+      <Button
+        variant="destructive"
+        onClick={() => {
+          handleDelete(job.id);
+          onClose();
+        }}
+      >
+        Delete
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
   );
 };
 
