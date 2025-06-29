@@ -143,7 +143,7 @@ const getAllQuestionsById = asyncWrap(async (req: Request, res: Response) => {
 const logout = asyncWrap(async (_req: Request, res: Response) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
-  return res.json({ message: "Logout successful" }).status(200);
+  return res.json({ success: true, message: "Logout successful" }).status(200);
 });
 
 const refreshToken = asyncWrap(async (req: Request, res: Response) => {

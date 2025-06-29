@@ -51,7 +51,7 @@ const login = async (req: Request, res: Response) => {
 const logout = async (_req: Request, res: Response) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
-  return res.json({ message: "Logout successful" }).status(200);
+  return res.json({sucess: true, message: "Logout successful" }).status(200);
 };
 
 const googleLogin = async (req: Request, res: Response) => {
