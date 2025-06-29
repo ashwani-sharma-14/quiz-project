@@ -9,6 +9,7 @@ import {
 import { lazy, Suspense } from "react";
 import BaseLayout from "@/app/layouts/BaseLayout";
 import AuthProvider from "@/app/providers/AuthProvider";
+
 const Home = lazy(() => import("@/app/pages/Home/Home"));
 const Quiz = lazy(() => import("@/app/pages/Quiz/Quiz"));
 const HiringUpdates = lazy(() => import("@/app/pages/Hiring/Hiring"));
@@ -31,7 +32,15 @@ const Signup = lazy(() => import("@/app/pages/SignUp/Signup"));
 export default function Routes() {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <>
+      <Route
+        path="/"
+        element={
+          <AuthProvider>
+            <Outlet />
+          </AuthProvider>
+        }
+      >
+        {/* Public routes - no BaseLayout */}
         <Route
           path="/login"
           element={
@@ -49,17 +58,17 @@ export default function Routes() {
           }
         />
 
+        {/* Protected routes - with BaseLayout */}
         <Route
+          path="/"
           element={
-            <AuthProvider>
-              <BaseLayout>
-                <Outlet />
-              </BaseLayout>
-            </AuthProvider>
+            <BaseLayout>
+              <Outlet />
+            </BaseLayout>
           }
         >
           <Route
-            path="/"
+            index
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <Home />
@@ -67,7 +76,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/quiz"
+            path="quiz"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <Quiz />
@@ -75,7 +84,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/quiz/quizScreen"
+            path="quiz/quizScreen"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <QuizPage />
@@ -83,7 +92,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/quiz/:id/analysis"
+            path="quiz/:id/analysis"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <QuizAnalysis />
@@ -91,7 +100,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/quiz/:id/review"
+            path="quiz/:id/review"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <QuizReview />
@@ -99,7 +108,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/previousQuizzes"
+            path="previousQuizzes"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <PreviousQuizzes />
@@ -107,7 +116,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/hiring"
+            path="hiring"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <HiringUpdates />
@@ -115,7 +124,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/hiring/:id"
+            path="hiring/:id"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <HiringPage />
@@ -123,7 +132,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/developer"
+            path="developer"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <About />
@@ -131,7 +140,7 @@ export default function Routes() {
             }
           />
           <Route
-            path="/profile"
+            path="profile"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <Profile />
@@ -139,7 +148,7 @@ export default function Routes() {
             }
           />
         </Route>
-      </>
+      </Route>
     )
   );
 
