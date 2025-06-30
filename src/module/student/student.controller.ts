@@ -84,7 +84,16 @@ const googleLogin = async (req: Request, res: Response) => {
 
   const user = await studentService.findUserByEmail(data.email);
 
-  if (!user) {
+ if (!user) {
+    if (data.email.endsWith("@gmail.com")) {
+      return res
+      .json({
+        success: false,
+        message: "Outside domain",
+        user: data,
+      })
+      .status(401);
+    }
     return res
       .json({
         success: false,
