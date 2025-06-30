@@ -4,9 +4,9 @@ import { Difficulty } from "@/generated/prisma";
 
 interface QuizConfig {
   userId: string;
-  category: string;
-  topics: string[];
-  difficulty: Difficulty;
+  categoryId: string;
+  topicsId: string[];
+  difficulty: Difficulty | Difficulty[];
   totalQuestions: number;
   timeLimit: number;
   mode: string;
@@ -22,28 +22,27 @@ interface AnswerSubmission {
 const generateQuiz = async (config: QuizConfig) => {
   const {
     userId,
-    category,
-    topics,
+    categoryId,
+    topicsId,
     difficulty,
     totalQuestions,
     timeLimit,
     mode,
   } = config;
-  console.log("Data recieved", config);
+
   const categoryRecord = await prisma.category.findUnique({
-    where: { name: category },
+    where: { id: categoryId },
   });
   if (!categoryRecord) throw new Error("Invalid category");
 
   const topicRecords = await prisma.topic.findMany({
     where: {
-      name: { in: topics },
-      categoryId: categoryRecord.id,
+      id: { in: topicsId },
+      categoryId: categoryId,
     },
   });
 
   const topicIds = topicRecords.map((t) => t.id);
-
   if (topicIds.length === 0) throw new Error("No matching topics found");
 
   const attemptedQuestions = await prisma.attemptedQuestion.findMany({
@@ -56,30 +55,45 @@ const generateQuiz = async (config: QuizConfig) => {
       questionId: true,
     },
   });
-
   const attemptedQuestionIds = attemptedQuestions.map((a) => a.questionId);
 
-  const availableQuestions = await prisma.question.findMany({
-    where: {
-      topicId: { in: topicIds },
-      difficulty,
-      id: { notIn: attemptedQuestionIds },
-    },
-  });
+  const perTopic = Math.floor(totalQuestions / topicIds.length);
+  const remainder = totalQuestions % topicIds.length;
 
-  if (availableQuestions.length === 0) {
+  let selected: any[] = [];
+  const isDifficultyArray = Array.isArray(difficulty);
+
+  for (let i = 0; i < topicIds.length; i++) {
+    const numQuestions = perTopic + (i < remainder ? 1 : 0);
+
+    const questions = await prisma.question.findMany({
+      where: {
+        topicId: topicIds[i],
+        difficulty: isDifficultyArray
+          ? { in: difficulty as Difficulty[] }
+          : (difficulty as Difficulty),
+        id: { notIn: attemptedQuestionIds },
+      },
+    });
+
+    const shuffled = questions.sort(() => 0.5 - Math.random());
+    selected = selected.concat(shuffled.slice(0, numQuestions));
+  }
+
+  if (selected.length === 0) {
     throw new Error("No unattempted questions available");
   }
 
-  const shuffled = availableQuestions.sort(() => 0.5 - Math.random());
-  const selected = shuffled.slice(0, totalQuestions);
+  selected = selected.sort(() => 0.5 - Math.random());
 
   const userQuiz = await prisma.userQuiz.create({
     data: {
       userId,
-      category,
-      topics,
-      difficulty,
+      category: categoryRecord.name,
+      topics: topicRecords.map((t) => t.name),
+      difficulty: isDifficultyArray
+        ? (difficulty as Difficulty[])[0] ?? "EASY"
+        : (difficulty as Difficulty),
       totalQuestions,
       timeLimit,
       mode,
@@ -217,9 +231,29 @@ const getUserQuizById = async (quizId: string) => {
   return quiz;
 };
 
+const getTopics = async () => {
+  const topics = await prisma.topic.findMany();
+  return topics;
+};
+
+const getCategories = async () => {
+  const categories = await prisma.category.findMany();
+  return categories;
+};
+
+const getTopicsByCategoryId = async (categoryId: string) => {
+  const topics = await prisma.topic.findMany({
+    where: { categoryId },
+  });
+  return topics;
+};
+
 export const quizService = {
   generateQuiz,
   submitQuiz,
   getAllUserQuizzes,
   getUserQuizById,
+  getTopics,
+  getCategories,
+  getTopicsByCategoryId,
 };

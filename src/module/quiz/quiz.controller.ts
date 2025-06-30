@@ -8,14 +8,29 @@ const generateQuiz = asyncWrap(async (req: Request, res: Response) => {
     throw new Error("User ID is required");
   }
 
-  const { category, topics, difficulty, totalQuestions, timeLimit, mode } =
+  const { categoryId, topicsId, difficulty, totalQuestions, timeLimit, mode } =
     req.query;
 
+  if (!categoryId || !topicsId) {
+    return res
+      .status(400)
+      .json({ message: "categoryId and topicsId are required" });
+  }
+
+  let difficultyFilter: Difficulty | Difficulty[];
+  if (typeof difficulty === "string" && difficulty.includes(",")) {
+    difficultyFilter = difficulty
+      .split(",")
+      .map((d) => d.trim().toUpperCase()) as Difficulty[];
+  } else {
+    difficultyFilter = (difficulty as string).toUpperCase() as Difficulty;
+  }
+
   const quiz = await quizService.generateQuiz({
-    userId: userId,
-    category: String(category),
-    topics: String(topics).split(","),
-    difficulty: difficulty as Difficulty,
+    userId,
+    categoryId: String(categoryId),
+    topicsId: String(topicsId).split(","),
+    difficulty: difficultyFilter,
     totalQuestions: Number(totalQuestions),
     timeLimit: Number(timeLimit),
     mode: String(mode),
@@ -48,9 +63,29 @@ const getUserQuizById = asyncWrap(async (req: Request, res: Response) => {
   res.json({ quiz });
 });
 
+const getTopics = asyncWrap(async (_req: Request, res: Response) => {
+  const topics = await quizService.getTopics();
+  res.json({ success: true, message: "topics fetched", topics });
+});
+
+const getCategories = asyncWrap(async (_req: Request, res: Response) => {
+  const categories = await quizService.getCategories();
+  res.json({ success: true, message: "categories fetched", categories });
+});
+
+const getTopicsByCategoryId = asyncWrap(async (req: Request, res: Response) => {
+  const categoryId = req.params.categoryId;
+  if (!categoryId) throw new Error("Category ID is required");
+  const topics = await quizService.getTopicsByCategoryId(categoryId);
+  res.json({ success: true, message: "topics fetched", topics });
+});
+
 export const quizController = {
   generateQuiz,
   submitQuiz,
   getAllUserQuizzes,
   getUserQuizById,
+  getTopics,
+  getCategories,
+  getTopicsByCategoryId,
 };

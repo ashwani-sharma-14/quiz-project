@@ -19,11 +19,14 @@ const signUpUser = async (req: Request, res: Response) => {
     email: user.email,
   });
 
+  const { password: _password, ...restUser } = user;
+
   return setAuthCookie(
     res,
     accessToken,
     "User Created and logged in successfully",
-    refreshToken
+    refreshToken,
+    restUser
   );
 };
 
@@ -44,14 +47,20 @@ const login = async (req: Request, res: Response) => {
     userId: String(user.id),
     email: user.email,
   });
-
-  return setAuthCookie(res, accessToken, "Login Successful", refreshToken);
+  const { password: _password, ...RestUser } = user;
+  return setAuthCookie(
+    res,
+    accessToken,
+    "Login Successful",
+    refreshToken,
+    RestUser
+  );
 };
 
 const logout = async (_req: Request, res: Response) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
-  return res.json({sucess: true, message: "Logout successful" }).status(200);
+  return res.json({ sucess: true, message: "Logout successful" }).status(200);
 };
 
 const googleLogin = async (req: Request, res: Response) => {
@@ -89,8 +98,14 @@ const googleLogin = async (req: Request, res: Response) => {
     userId: String(user.id),
     email: user.email,
   });
-
-  return setAuthCookie(res, accessToken, "Login Successful", refreshToken);
+  const { password, ...RestUser } = user;
+  return setAuthCookie(
+    res,
+    accessToken,
+    "Login Successful",
+    refreshToken,
+    RestUser
+  );
 };
 
 const refreshToken = asyncWrap(async (req: Request, res: Response) => {

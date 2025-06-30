@@ -4,7 +4,8 @@ export const setAuthCookie = (
   res: Response,
   accessToken: string,
   message: string,
-  refreshToken?: string
+  refreshToken?: string,
+  user?: any
 ) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: false,
@@ -23,5 +24,6 @@ export const setAuthCookie = (
   res.status(201).json({
     success: true,
     message,
+    user,
   });
 };
