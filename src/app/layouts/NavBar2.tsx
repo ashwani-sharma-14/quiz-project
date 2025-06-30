@@ -2,6 +2,7 @@ import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import logo from "../../assets/logoWithName.png";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
+
 type NavbarProps = {
   isOpen: boolean;
   toggleSidebar: () => void;
@@ -11,8 +12,20 @@ interface UseAuthStore {
   logout: () => Promise<boolean>;
 }
 
+type User = {
+  admissionYear: number;
+  branch: string;
+  currentYear: number;
+  email: string;
+  enrollment: string;
+  id: string;
+  name: string;
+  profile: string;
+};
 const Navbar = ({ isOpen, toggleSidebar }: NavbarProps) => {
   const logout = useAuthStore((state) => state as UseAuthStore).logout;
+  const user = useAuthStore((state) => (state as { user: User }).user);
+
 
   const handleLogout = async () => {
     const success = await logout();
@@ -34,10 +47,20 @@ const Navbar = ({ isOpen, toggleSidebar }: NavbarProps) => {
         </button>
         <img src={logo} alt="Logo" className="h-10" />
       </div>
-      <div className="hidden md:flex items-center gap-4">
+      <div className=" flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <FaUserCircle className="text-2xl text-purple-700" />
-          <span className="text-sm font-semibold">VANSH SHRIVASTAVA</span>
+          {user.profile ? (
+            <img
+            src={user.profile}
+            alt={user.name || "User"}
+            className="w-8 h-8 rounded-full"
+          />
+          ) : (
+            <FaUserCircle className="text-2xl text-purple-700" />
+          )}
+          <span className=" hidden md:flex text-sm font-semibold">
+            {user.name || "Guest User"}
+          </span>
         </div>
         <button
           onClick={handleLogout}

@@ -106,8 +106,10 @@ const Login: React.FC = () => {
           </Button>
         </form>
 
-        <div className="text-gray-500 text-sm my-4">or</div>
-        <GoogleLogin />
+        <div className="text-gray-500 text-sm my-4 ">or</div>
+        <div className="flex justify-center">
+          <GoogleLogin />
+        </div>
       </div>
     </div>
   );

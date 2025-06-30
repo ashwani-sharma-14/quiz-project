@@ -5,7 +5,7 @@ interface Question {
   correctAnswer: string;
 }
 
-export  const dummyQuestions: Question[] = [
+export const dummyQuestions: Question[] = [
   {
     id: 1,
     question:

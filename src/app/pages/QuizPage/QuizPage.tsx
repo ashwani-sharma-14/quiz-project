@@ -24,6 +24,10 @@ const QuizPage = () => {
   const data = !showInstruction ? QuizData?.questions ?? [] : [];
   const { category, topics, difficulty, timeLimit } =
     QuizData?.userQuizData || {};
+  
+  console.log(QuizData);
+  
+
 
 
 
@@ -77,7 +81,7 @@ const QuizPage = () => {
 
   useEffect(() => {
     if (security) {
-      activateAllSecurityHooks();
+      // activateAllSecurityHooks();
       const el = document.documentElement;
       el.requestFullscreen?.();
       toast.success("Quiz started in secure fullscreen mode.");
@@ -105,20 +109,20 @@ const QuizPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentIndex]);
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const customEvent = e as CustomEvent<{
-        message: string;
-        fullscreen?: boolean;
-      }>;
-      const { message, fullscreen } = customEvent.detail;
-      setAlertMessage(message);
-      setReEnterFullscreen(!!fullscreen);
-    };
+  // useEffect(() => {
+  //   const handler = (e: Event) => {
+  //     const customEvent = e as CustomEvent<{
+  //       message: string;
+  //       fullscreen?: boolean;
+  //     }>;
+  //     const { message, fullscreen } = customEvent.detail;
+  //     setAlertMessage(message);
+  //     setReEnterFullscreen(!!fullscreen);
+  //   };
 
-    window.addEventListener("security-alert", handler);
-    return () => window.removeEventListener("security-alert", handler);
-  }, []);
+  //   window.addEventListener("security-alert", handler);
+  //   return () => window.removeEventListener("security-alert", handler);
+  // }, []);
 
   const handleNoOptionSelect = (message: string) => {
     if (!selectedOption) {
@@ -135,7 +139,7 @@ const QuizPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+    <div className="h-[calc(100vh-6rem)] bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden md:overflow-auto md:p-6 hide-scrollbar">
       {showInstruction ? (
         <InstructionModal
           setShowInstruction={setShowInstruction}
@@ -197,7 +201,6 @@ const QuizPage = () => {
                 setAnswers(updated);
                 setSelectedOption(value);
               }}
-              
               onClear={() => {
                 const updated = [...answers];
                 updated[currentIndex] = null;

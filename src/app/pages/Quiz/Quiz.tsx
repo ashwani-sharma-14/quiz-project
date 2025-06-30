@@ -1,54 +1,57 @@
 import { useQuizStore } from "@/store/useQuizStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const categories = ["Aptitude", "DSA"];
-const topicsMap = {
-  Aptitude: [
-    "Numbers",
-    "Percentage",
-    "Profit and Loss",
-    "Average",
-    "Ratio and Proportion",
-    "Mixture and Alligation",
-    "Time and Work",
-    "Time Speed Distance",
-    "Pipes and Cisterns",
-    "Algebra",
-    "Trigonometry, Height, and Distance",
-    "Geometry",
-    "Probability",
-    "Permutation and Combination (PnC)",
-    "Age",
-  ],
-  DSA: [
-    "Arrays",
-    "Linked Lists",
-    "Trees",
-    "Sorting",
-    "Searching",
-    "Graphs",
-    "Dynamic Programming",
-    "Algorithm Complexity",
-  ],
-};
 
 const Quiz = () => {
   const [step, setStep] = useState(1);
-  const [category, setCategory] = useState("");
-  const [topics, setTopics] = useState<string[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState("Mixed");
   const [questions, setQuestions] = useState(10);
   const [time, setTime] = useState(30);
+
+  const [categoryMap, setCategoryMap] = useState<Record<string, string>>({});
+  const [topicsMap, setTopicsMap] = useState<
+    Record<string, { id: string; name: string }[]>
+  >({});
+
   const createQuiz = useQuizStore((state) => state.createQuiz);
   const isCreatingQuiz = useQuizStore((state) => state.isCreatingQuiz);
+  const getCategoryAndTopicsData = useQuizStore(
+    (state) => state.getCategoryAndTopicsData
+  );
+  const categoryAndTopics = useQuizStore((state) => state.categoryAndTopics);
+
   const navigator = useNavigate();
 
-  const toggleTopic = (topic: string) => {
-    setTopics((prev) =>
-      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
+  const toggleTopic = (topicId: string) => {
+    setSelectedTopicIds((prev) =>
+      prev.includes(topicId)
+        ? prev.filter((t) => t !== topicId)
+        : [...prev, topicId]
     );
   };
+
+  useEffect(() => {
+    getCategoryAndTopicsData();
+  }, [getCategoryAndTopicsData]);
+
+  useEffect(() => {
+    if (categoryAndTopics) {
+      const catMap: Record<string, string> = {};
+      categoryAndTopics.category.forEach(([id, name]) => {
+        catMap[id] = name;
+      });
+      setCategoryMap(catMap);
+
+      const tempTopicMap: Record<string, { id: string; name: string }[]> = {};
+      categoryAndTopics.topics.forEach(([id, topicName, categoryId]) => {
+        if (!tempTopicMap[categoryId]) tempTopicMap[categoryId] = [];
+        tempTopicMap[categoryId].push({ id, name: topicName });
+      });
+      setTopicsMap(tempTopicMap);
+    }
+  }, [categoryAndTopics]);
 
   const renderStep = () => {
     switch (step) {
@@ -59,46 +62,51 @@ const Quiz = () => {
               Select a Category
             </h2>
             <div className="grid grid-cols-2 gap-4">
-              {categories.map((sub) => (
+              {Object.entries(categoryMap).map(([id, name]) => (
                 <button
-                  key={sub}
-                  className={`p-4 border rounded-xl text-lg font-medium transition ${
-                    category === sub
-                      ? "bg-blue-100 border-blue-500 text-blue-700 shadow"
-                      : "hover:bg-gray-50"
+                  key={id}
+                  className={`p-4 rounded-2xl text-lg font-semibold transition duration-300 border-2 ${
+                    selectedCategoryId === id
+                      ? "bg-blue-100 border-blue-500 text-blue-700 shadow-md"
+                      : "border-gray-300 hover:bg-blue-50 text-gray-600"
                   }`}
-                  onClick={() => setCategory(sub)}
+                  onClick={() => {
+                    setSelectedCategoryId(id);
+                    setSelectedTopicIds([]); // reset topics if category changes
+                  }}
                 >
-                  {sub}
+                  {name}
                 </button>
               ))}
             </div>
           </div>
         );
+
       case 2:
         return (
           <div>
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">
               Choose Topics
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[200px] overflow-y-auto pr-2 hide-scrollbar ">
-              {topicsMap[category as keyof typeof topicsMap]?.map((topic) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[200px] overflow-y-auto pr-2 scroll-smooth hide-scrollbar">
+              {topicsMap[selectedCategoryId]?.map(({ id, name }) => (
                 <label
-                  key={topic}
-                  className="flex items-center gap-3 bg-gray-50 p-2 rounded-md border hover:bg-gray-100 transition"
+                  key={id}
+                  className="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200 hover:shadow transition"
                 >
                   <input
                     type="checkbox"
-                    checked={topics.includes(topic)}
-                    onChange={() => toggleTopic(topic)}
-                    className="accent-blue-600"
+                    checked={selectedTopicIds.includes(id)}
+                    onChange={() => toggleTopic(id)}
+                    className="accent-blue-600 w-4 h-4"
                   />
-                  <span className="text-gray-700">{topic}</span>
+                  <span className="text-gray-700 font-medium">{name}</span>
                 </label>
               ))}
             </div>
           </div>
         );
+
       case 3:
         return (
           <div className="space-y-6">
@@ -106,8 +114,8 @@ const Quiz = () => {
               Set Quiz Preferences
             </h2>
 
-            <div>
-              <label className="block text-gray-600 font-medium mb-2">
+            <div className="space-y-4">
+              <label className="block text-gray-600 font-semibold mb-2">
                 Difficulty
               </label>
               <div className="flex flex-wrap gap-3">
@@ -115,10 +123,10 @@ const Quiz = () => {
                   <button
                     key={level}
                     onClick={() => setDifficulty(level)}
-                    className={`px-4 py-2 rounded-md border text-sm transition font-medium ${
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition border-2 ${
                       difficulty === level
-                        ? "bg-blue-100 border-blue-600 text-blue-700 shadow"
-                        : "border-gray-300 text-gray-600 hover:bg-gray-50"
+                        ? "bg-blue-100 border-blue-500 text-blue-700 shadow"
+                        : "border-gray-300 text-gray-600 hover:bg-blue-50"
                     }`}
                   >
                     {level}
@@ -128,49 +136,51 @@ const Quiz = () => {
             </div>
 
             <div>
-              <label className="block text-gray-600 font-medium mb-2">
+              <label className="block text-gray-600 font-semibold mb-2">
                 Number of Questions
               </label>
               <input
                 type="number"
-                value={questions}
+                value={questions==0?"":questions}
                 onChange={(e) => setQuestions(Number(e.target.value))}
-                className="w-full border border-gray-300 px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-gray-600 font-medium mb-2">
+              <label className="block text-gray-600 font-semibold mb-2">
                 Time Limit (minutes)
               </label>
               <input
                 type="number"
-                value={time}
+                value={time==0?"":time}
                 onChange={(e) => setTime(Number(e.target.value))}
-                className="w-full border border-gray-300 px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
         );
+
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="min-h-[screen-4rem] bg-gradient-to-br from-blue-50 to-white p-6 sm:p-10">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 sm:p-10 space-y-8">
+    <div className="h-[calc(100vh-6rem)] bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden">
+      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl flex flex-col p-6 sm:p-8 h-[calc(30rem)] space-y-4 border border-gray-200">
         <h1 className="text-3xl font-extrabold text-blue-700">
           Start New Practice
         </h1>
 
-        {/* Stepper */}
-        <div className="flex justify-between items-center relative pb-4">
-          <div className="absolute top-1/4 left-0 w-full h-0.5 bg-gray-200 z-0" />
+        <div className="flex justify-between items-center relative pb-6">
+          <div className="absolute top-5 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2" />
           {[1, 2, 3].map((s) => (
             <div
               key={s}
-              className={`relative z-10 w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm ${
+              className={`relative z-10 w-9 h-9 flex items-center justify-center rounded-full font-bold text-sm transition ${
                 step >= s
-                  ? "bg-blue-600 text-white"
+                  ? "bg-blue-600 text-white shadow"
                   : "bg-gray-300 text-gray-700"
               }`}
             >
@@ -179,15 +189,15 @@ const Quiz = () => {
           ))}
         </div>
 
-        {/* Dynamic Step Content */}
-        {renderStep()}
+        <div className="flex-1 overflow-y-auto pr-1 scroll-smooth hide-scrollbar">
+          {renderStep()}
+        </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between pt-6">
+        <div className="flex justify-between pt-4">
           {step > 1 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="px-6 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-md transition"
+              className="px-6 py-2 text-white bg-gray-400 hover:bg-gray-500 rounded-full transition font-medium"
             >
               Previous
             </button>
@@ -196,10 +206,14 @@ const Quiz = () => {
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
-              disabled={!category || (step === 2 && topics.length === 0)}
-              className={`ml-auto px-6 py-2 rounded-md font-medium transition ${
-                !category || (step === 2 && topics.length === 0)
-                  ? "bg-gray-300 cursor-not-allowed"
+              disabled={
+                !selectedCategoryId ||
+                (step === 2 && selectedTopicIds.length === 0)
+              }
+              className={`ml-auto px-6 py-2 rounded-full font-medium transition ${
+                !selectedCategoryId ||
+                (step === 2 && selectedTopicIds.length === 0)
+                  ? "bg-gray-300 cursor-not-allowed text-gray-600"
                   : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
             >
@@ -207,22 +221,21 @@ const Quiz = () => {
             </button>
           ) : (
             <button
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition font-medium"
-              onClick={() => {
-                createQuiz({
-                  category: category,
-                  topics: topics,
-                  difficulty: difficulty,
+              className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition font-medium ml-auto"
+                onClick={async () => {
+            
+                await createQuiz({
+                  category: selectedCategoryId,
+                  topics: selectedTopicIds,
+                  difficulty,
                   totalQuestions: questions,
                   timeLimit: time,
                 });
-                if (!isCreatingQuiz) {
-                  navigator("/quiz/quizScreen");
-                }
-              }
-              }
+                navigator("/quiz/quizScreen");
+              }}
+              disabled={isCreatingQuiz}
             >
-              Start Quiz
+              {isCreatingQuiz ? "Starting..." : "Start Quiz"}
             </button>
           )}
         </div>

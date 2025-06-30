@@ -2,10 +2,10 @@ import { NavLink } from "react-router-dom";
 import { FaHome, FaBolt, FaStore, FaUser, FaBrain } from "react-icons/fa";
 
 type SidebarProps = {
-  isOpen: boolean;
   closeSidebar: () => void;
 };
-const Sidebar = ({ isOpen, closeSidebar }: SidebarProps) => {
+
+const Sidebar = ({  closeSidebar }: SidebarProps) => {
   const links = [
     { to: "/", label: "Home", icon: <FaHome /> },
     { to: "/quiz", label: "Quiz", icon: <FaBrain /> },
@@ -15,11 +15,7 @@ const Sidebar = ({ isOpen, closeSidebar }: SidebarProps) => {
   ];
 
   return (
-    <div
-      className={`bg-white shadow-md p-4 pt-6 space-y-4 w-64 h-screen fixed left-0 top-14 z-40 transform transition-transform duration-300 md:static md:top-0 md:translate-x-0 md:block ${
-        isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-      }`}
-    >
+    <div className="bg-white shadow-md p-4 pt-6 space-y-4 w-64 h-full">
       <nav className="flex flex-col gap-2 text-md">
         {links.map((link, index) => (
           <NavLink
@@ -32,7 +28,7 @@ const Sidebar = ({ isOpen, closeSidebar }: SidebarProps) => {
                   : "text-gray-700 hover:text-blue-700 hover:bg-blue-50"
               }`
             }
-            onClick={closeSidebar} // Auto-close on mobile
+            onClick={closeSidebar}
           >
             <span className="text-lg">{link.icon}</span>
             <span>{link.label}</span>
