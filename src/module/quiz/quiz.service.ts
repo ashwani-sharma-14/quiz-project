@@ -14,6 +14,7 @@ interface QuizConfig {
 
 interface AnswerSubmission {
   userQuizId: string;
+  timeTaken: number;
   answers: {
     questionId: string;
     selectedAnswer: string;
@@ -23,7 +24,7 @@ const generateQuiz = async (config: QuizConfig) => {
   const {
     userId,
     categoryId,
-    topicsId,
+    topicsId, 
     difficulty,
     totalQuestions,
     timeLimit,
@@ -76,6 +77,7 @@ const generateQuiz = async (config: QuizConfig) => {
         id: { notIn: attemptedQuestionIds },
       },
     });
+ 
 
     const shuffled = questions.sort(() => 0.5 - Math.random());
     for (const q of shuffled) {
@@ -89,6 +91,8 @@ const generateQuiz = async (config: QuizConfig) => {
       if (selected.length >= totalQuestions) break;
     }
   }
+
+
 
   if (selected.length === 0) {
     throw new Error("No unattempted questions available");
@@ -131,10 +135,25 @@ const generateQuiz = async (config: QuizConfig) => {
         topicId,
       })
     ),
+    userQuizData: {
+      userQuizId: userQuiz.id,
+      category: categoryRecord.name,
+      topics: topicRecords.map((t) => t.name),
+      difficulty: isDifficultyArray
+        ? (difficulty as Difficulty[])[0] ?? "EASY"
+        : (difficulty as Difficulty),
+      totalQuestions,
+      timeLimit,
+      correct: null,
+      incorrect: null,
+      accuracy: null,
+      timeTaken: null,
+      score: null,
+    },
   };
 };
 
-const submitQuiz = async ({ userQuizId, answers }: AnswerSubmission) => {
+const submitQuiz = async ({ userQuizId, answers, timeTaken }: AnswerSubmission) => {
   const userQuiz = await prisma.userQuiz.findUnique({
     where: { id: userQuizId },
     include: { quizQuestions: true },
@@ -185,6 +204,7 @@ const submitQuiz = async ({ userQuizId, answers }: AnswerSubmission) => {
     where: { id: userQuizId },
     data: {
       score,
+      timeTaken,
     },
   });
 

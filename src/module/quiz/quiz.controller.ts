@@ -26,7 +26,7 @@ const generateQuiz = asyncWrap(async (req: Request, res: Response) => {
     difficultyFilter = (difficulty as string).toUpperCase() as Difficulty;
   }
 
-  const quiz = await quizService.generateQuiz({
+  const data = await quizService.generateQuiz({
     userId,
     categoryId: String(categoryId),
     topicsId: String(topicsId).split(","),
@@ -35,7 +35,7 @@ const generateQuiz = asyncWrap(async (req: Request, res: Response) => {
     timeLimit: Number(timeLimit),
     mode: String(mode),
   });
-  return res.json({ message: "quiz created", quiz });
+  return res.json({ message: "quiz created", data });
 });
 
 const submitQuiz = asyncWrap(async (req: Request, res: Response) => {
@@ -60,6 +60,7 @@ const getUserQuizById = asyncWrap(async (req: Request, res: Response) => {
   }
 
   const quiz = await quizService.getUserQuizById(quizId);
+  
   res.json({ quiz });
 });
 

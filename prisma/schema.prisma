@@ -50,7 +50,7 @@ enum Difficulty {
   HARD
   MIXED
 }
-
+ 
 model Question {
   id                 String              @id @default(uuid())
   question           String              @unique
@@ -96,6 +96,7 @@ model UserQuiz {
   correct       CorrectQuestion[]
   wrong         WrongQuestion[]
   attempted     AttemptedQuestion[]
+  timeTaken Int?
 }
 
 model CorrectQuestion {
