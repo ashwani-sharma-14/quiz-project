@@ -9,16 +9,16 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
+  id            String     @id @default(uuid())
   name          String
-  email         String   @unique
+  email         String     @unique
   password      String
-  enrollment    String   @unique
+  enrollment    String     @unique
   profile       String
   branch        String
   admissionYear Int
   currentYear   Int
-  quizzes UserQuiz[]
+  quizzes       UserQuiz[]
 }
 
 model Admin {
@@ -53,11 +53,11 @@ enum Difficulty {
 
 model Question {
   id                 String              @id @default(uuid())
-  question           String
+  question           String              @unique
   options            Json
   correctAns         String
   difficulty         Difficulty
-  solution           String? @db.LongText 
+  solution           String?             @db.LongText
   topicId            String
   topic              Topic               @relation(fields: [topicId], references: [id])
   quizzes            Quiz[]
@@ -125,7 +125,7 @@ model AttemptedQuestion {
 model Jobs {
   id             String  @id @default(uuid())
   jobTitle       String
-  jobDescription String @db.LongText
+  jobDescription String  @db.LongText
   companyName    String
   applyLink      String
   package        String?
