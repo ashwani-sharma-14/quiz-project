@@ -172,7 +172,7 @@ const submitQuiz = async ({
 
     if (!question) continue;
 
-    // Store attempted
+    
     await prisma.attemptedQuestion.create({
       data: {
         userQuizId,
@@ -180,7 +180,7 @@ const submitQuiz = async ({
       },
     });
 
-    // Store user answer
+    
     await prisma.userAnswer.create({
       data: {
         userQuizId,
