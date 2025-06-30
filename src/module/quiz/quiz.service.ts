@@ -24,7 +24,7 @@ const generateQuiz = async (config: QuizConfig) => {
   const {
     userId,
     categoryId,
-    topicsId, 
+    topicsId,
     difficulty,
     totalQuestions,
     timeLimit,
@@ -77,7 +77,6 @@ const generateQuiz = async (config: QuizConfig) => {
         id: { notIn: attemptedQuestionIds },
       },
     });
- 
 
     const shuffled = questions.sort(() => 0.5 - Math.random());
     for (const q of shuffled) {
@@ -91,8 +90,6 @@ const generateQuiz = async (config: QuizConfig) => {
       if (selected.length >= totalQuestions) break;
     }
   }
-
-
 
   if (selected.length === 0) {
     throw new Error("No unattempted questions available");
@@ -153,7 +150,11 @@ const generateQuiz = async (config: QuizConfig) => {
   };
 };
 
-const submitQuiz = async ({ userQuizId, answers, timeTaken }: AnswerSubmission) => {
+const submitQuiz = async ({
+  userQuizId,
+  answers,
+  timeTaken,
+}: AnswerSubmission) => {
   const userQuiz = await prisma.userQuiz.findUnique({
     where: { id: userQuizId },
     include: { quizQuestions: true },
@@ -171,10 +172,21 @@ const submitQuiz = async ({ userQuizId, answers, timeTaken }: AnswerSubmission) 
 
     if (!question) continue;
 
+    // Store attempted
     await prisma.attemptedQuestion.create({
       data: {
         userQuizId,
         questionId: ans.questionId,
+      },
+    });
+
+    // Store user answer
+    await prisma.userAnswer.create({
+      data: {
+        userQuizId,
+        questionId: ans.questionId,
+        selected: ans.selectedAnswer,
+        correct: question.correctAns,
       },
     });
 
@@ -212,6 +224,7 @@ const submitQuiz = async ({ userQuizId, answers, timeTaken }: AnswerSubmission) 
     totalAttempted: total,
     correct: correctCount,
     wrong: wrongCount,
+    timeTaken,
     score,
   };
 };
@@ -246,8 +259,18 @@ const getUserQuizById = async (quizId: string) => {
               id: true,
               question: true,
               options: true,
+              correctAns: true,
+              difficulty: true,
+              topicId: true,
             },
           },
+        },
+      },
+      userAnswers: {
+        select: {
+          questionId: true,
+          selected: true,
+          correct: true,
         },
       },
       correct: { select: { questionId: true } },
@@ -258,7 +281,36 @@ const getUserQuizById = async (quizId: string) => {
 
   if (!quiz) throw new Error("Quiz not found");
 
-  return quiz;
+  const answerMap = new Map<string, { selected?: string; correct?: string }>(
+    quiz.userAnswers.map((a) => [
+      a.questionId,
+      { selected: a.selected, correct: a.correct },
+    ])
+  );
+
+  const questions = quiz.quizQuestions.map((q) => {
+    const answer = answerMap.get(q.questionId);
+    return {
+      id: q.questionId,
+      question: q.questions.question,
+      options: q.questions.options,
+      correctAns: q.questions.correctAns,
+      difficulty: q.questions.difficulty,
+      topicId: q.questions.topicId,
+      userSelected: answer?.selected ?? null,
+      correct: answer?.correct ?? q.questions.correctAns,
+      isCorrect:
+        answer?.selected === (answer?.correct ?? q.questions.correctAns),
+    };
+  });
+
+  return {
+    ...quiz,
+    questions,
+    correctQuestions: quiz.correct.map((q) => q.questionId),
+    wrongQuestions: quiz.wrong.map((q) => q.questionId),
+    attemptedQuestions: quiz.attempted.map((q) => q.questionId),
+  };
 };
 
 const getTopics = async () => {

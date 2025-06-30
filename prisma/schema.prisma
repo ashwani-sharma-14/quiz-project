@@ -50,7 +50,7 @@ enum Difficulty {
   HARD
   MIXED
 }
- 
+
 model Question {
   id                 String              @id @default(uuid())
   question           String              @unique
@@ -64,6 +64,7 @@ model Question {
   correctInQuizzes   CorrectQuestion[]
   wrongInQuizzes     WrongQuestion[]
   attemptedInQuizzes AttemptedQuestion[]
+  userAnswers        UserAnswer[]
 }
 
 model Quiz {
@@ -72,6 +73,17 @@ model Quiz {
   userQuizId String
   questions  Question @relation(fields: [questionId], references: [id])
   userQuiz   UserQuiz @relation(fields: [userQuizId], references: [id])
+}
+
+model UserAnswer {
+  id         String @id @default(uuid())
+  userQuizId String
+  questionId String
+  selected   String
+  correct    String
+
+  userQuiz UserQuiz @relation(fields: [userQuizId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
 }
 
 model UserQuiz {
@@ -89,14 +101,14 @@ model UserQuiz {
   // correct        Int
   // wrong          Int
   score          Float
-
-  createdAt DateTime @default(now())
+  timeTaken      Int?
+  createdAt      DateTime   @default(now())
 
   quizQuestions Quiz[]
   correct       CorrectQuestion[]
   wrong         WrongQuestion[]
   attempted     AttemptedQuestion[]
-  timeTaken Int?
+  userAnswers   UserAnswer[]
 }
 
 model CorrectQuestion {
