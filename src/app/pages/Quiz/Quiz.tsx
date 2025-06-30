@@ -6,7 +6,7 @@ const Quiz = () => {
   const [step, setStep] = useState(1);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
-  const [difficulty, setDifficulty] = useState("Mixed");
+  const [difficulty, setDifficulty] = useState("Easy");
   const [questions, setQuestions] = useState(10);
   const [time, setTime] = useState(30);
 
@@ -165,6 +165,7 @@ const Quiz = () => {
         return null;
     }
   };
+  
 
   return (
     <div className="h-[calc(100vh-6rem)] bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden">

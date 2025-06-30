@@ -57,6 +57,14 @@ export default function Routes() {
             </Suspense>
           }
         />
+        <Route
+          path="quiz/quizScreen"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <QuizPage />
+            </Suspense>
+          }
+        />
 
         {/* Protected routes - with BaseLayout */}
         <Route
@@ -83,14 +91,7 @@ export default function Routes() {
               </Suspense>
             }
           />
-          <Route
-            path="quiz/quizScreen"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <QuizPage />
-              </Suspense>
-            }
-          />
+
           <Route
             path="quiz/:id/analysis"
             element={

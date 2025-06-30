@@ -13,7 +13,6 @@ import {
   deactivateSecurityHooks,
 } from "../../../utils/useQuizSecurity";
 
-
 const QuizPage = () => {
   const navigate = useNavigate();
   const QuizData = useQuizStore((state) => state.createQuizState);
@@ -21,22 +20,26 @@ const QuizPage = () => {
   const isCreatingQuiz = useQuizStore((state) => state.isCreatingQuiz);
 
   const [showInstruction, setShowInstruction] = useState(true);
-  const data = !showInstruction ? QuizData?.questions ?? [] : [];
+  const questions = QuizData?.questions || [];
   const { category, topics, difficulty, timeLimit } =
     QuizData?.userQuizData || {};
-  
-  console.log(QuizData);
-  
 
+  const [normalizedQuestions, setNormalizedQuestions] = useState(questions);
 
-
+  useEffect(() => {
+    const transformed = questions.map((q) => ({
+      ...q,
+      options: Object.values(q.options),
+    }));
+    setNormalizedQuestions(transformed);
+  }, [questions]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<(string | null)[]>(
-    Array(data.length).fill(null)
+    Array(questions.length).fill(null)
   );
   const [questionStatus, setQuestionStatus] = useState<string[]>(
-    Array(data.length).fill("unvisited")
+    Array(questions.length).fill("unvisited")
   );
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
@@ -52,12 +55,12 @@ const QuizPage = () => {
     deactivateSecurityHooks();
     localStorage.removeItem("switchAttempts");
     toast.success("Quiz submitted successfully.");
-    const quidId = useQuizStore.getState().createQuizState?.userQuizData?.userQuizId;
+    const quidId = QuizData?.userQuizId;
     updateQuiz({
       userQuizId: quidId ?? "",
-      remeningTime: remainingTime,
+      timeTaken: (quizTimeInSeconds - remainingTime) / 60,
       answers: answers.map((answer, index) => ({
-        questionId: String(data[index].id),
+        questionId: String(questions[index].id),
         selectedAnswer: answer || "",
       })),
     });
@@ -81,7 +84,7 @@ const QuizPage = () => {
 
   useEffect(() => {
     if (security) {
-      // activateAllSecurityHooks();
+      activateAllSecurityHooks();
       const el = document.documentElement;
       el.requestFullscreen?.();
       toast.success("Quiz started in secure fullscreen mode.");
@@ -109,20 +112,20 @@ const QuizPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentIndex]);
 
-  // useEffect(() => {
-  //   const handler = (e: Event) => {
-  //     const customEvent = e as CustomEvent<{
-  //       message: string;
-  //       fullscreen?: boolean;
-  //     }>;
-  //     const { message, fullscreen } = customEvent.detail;
-  //     setAlertMessage(message);
-  //     setReEnterFullscreen(!!fullscreen);
-  //   };
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<{
+        message: string;
+        fullscreen?: boolean;
+      }>;
+      const { message, fullscreen } = customEvent.detail;
+      setAlertMessage(message);
+      setReEnterFullscreen(!!fullscreen);
+    };
 
-  //   window.addEventListener("security-alert", handler);
-  //   return () => window.removeEventListener("security-alert", handler);
-  // }, []);
+    window.addEventListener("security-alert", handler);
+    return () => window.removeEventListener("security-alert", handler);
+  }, []);
 
   const handleNoOptionSelect = (message: string) => {
     if (!selectedOption) {
@@ -133,13 +136,13 @@ const QuizPage = () => {
     updatedStatus[currentIndex] = message;
     setQuestionStatus(updatedStatus);
 
-    if (currentIndex < data.length - 1) {
+    if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
 
   return (
-    <div className="h-[calc(100vh-6rem)] bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden md:overflow-auto md:p-6 hide-scrollbar">
+    <div className="h-full bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden md:overflow-auto md:p-6 hide-scrollbar">
       {showInstruction ? (
         <InstructionModal
           setShowInstruction={setShowInstruction}
@@ -192,33 +195,35 @@ const QuizPage = () => {
           />
 
           <div className="flex flex-col md:flex-row gap-4 mt-4">
-            <QuestionPanel
-              question={data[currentIndex]}
-              selectedOption={selectedOption}
-              onOptionChange={(value) => {
-                const updated = [...answers];
-                updated[currentIndex] = value;
-                setAnswers(updated);
-                setSelectedOption(value);
-              }}
-              onClear={() => {
-                const updated = [...answers];
-                updated[currentIndex] = null;
-                setAnswers(updated);
-                setSelectedOption(null);
-                const updatedStatus = [...questionStatus];
-                updatedStatus[currentIndex] = "unvisited";
-                setQuestionStatus(updatedStatus);
-              }}
-              onNext={() => handleNoOptionSelect("answered")}
-              onSaveMarkForReview={() =>
-                handleNoOptionSelect("savedAndMarkedForReview")
-              }
-              setShowSummary={setShowSummary}
-            />
+            {questions[currentIndex] && (
+              <QuestionPanel
+                question={normalizedQuestions[currentIndex]}
+                selectedOption={selectedOption}
+                onOptionChange={(value) => {
+                  const updated = [...answers];
+                  updated[currentIndex] = value;
+                  setAnswers(updated);
+                  setSelectedOption(value);
+                }}
+                onClear={() => {
+                  const updated = [...answers];
+                  updated[currentIndex] = null;
+                  setAnswers(updated);
+                  setSelectedOption(null);
+                  const updatedStatus = [...questionStatus];
+                  updatedStatus[currentIndex] = "unvisited";
+                  setQuestionStatus(updatedStatus);
+                }}
+                onNext={() => handleNoOptionSelect("answered")}
+                onSaveMarkForReview={() =>
+                  handleNoOptionSelect("savedAndMarkedForReview")
+                }
+                setShowSummary={setShowSummary}
+              />
+            )}
 
             <SidePanel
-              questions={data}
+              questions={normalizedQuestions}
               questionStatus={questionStatus}
               currentIndex={currentIndex}
               setCurrentIndex={setCurrentIndex}
@@ -232,7 +237,7 @@ const QuizPage = () => {
                 questionStatus.filter((s) => s === "savedAndMarkedForReview")
                   .length
               }
-              total={data.length}
+              total={questions.length}
               onConfirmSubmit={handleFinalSubmit}
               onClose={() => setShowSummary(false)}
             />

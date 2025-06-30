@@ -1,5 +1,8 @@
 import { NavLink } from "react-router-dom";
 
+
+
+
 const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-6 sm:p-10 space-y-10">

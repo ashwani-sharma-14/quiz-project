@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   FaCheckCircle,
   FaTimesCircle,
@@ -6,14 +6,18 @@ import {
   FaClock,
 } from "react-icons/fa";
 import ProgressBar from "./components/ProgressBar";
-import {  useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuizStore } from "@/store/useQuizStore";
 import { Button } from "@/components/ui/button";
 
 const QuizAnalysis: React.FC = () => {
-  const { quizId } = useParams();
+  const { id } = useParams();
+  const quizId = id;
   const fetchQuiz = useQuizStore((state) => state.fetchQuiz);
-  const quizData = useQuizStore((state) => state.createQuizState);
+  const quizData = useQuizStore((state) => state.fetchQuizState);
+  const isLoading = useQuizStore((state) => state.isCheckingQuiz);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (quizId) {
@@ -21,34 +25,34 @@ const QuizAnalysis: React.FC = () => {
     }
   }, [quizId]);
 
-  const navigate = useNavigate();
-
-  if (!quizData?.userQuizData) {
-    return (
-      <div className="text-center mt-10 text-gray-600">Loading analysis...</div>
-    );
-  }
-
-  const {
-    category,
-    totalQuestions,
-    timeLimit,
-    score,
-    correct,
-    incorrect,
-    accuracy,
-    timeTaken,
-  } = quizData.userQuizData;
-
-  const totalMarks = totalQuestions;
-
-  const handleReattempt = () => {
-    navigate(`/quiz/quizScreen`);
-  };
 
   const handleReview = () => {
-   navigate(`/quiz/${quizId}/review`);
+    navigate(`/quiz/${quizId}/review`);
   };
+
+  // Memoized values for better performance
+  const correctCount = useMemo(
+    () => Object.keys(quizData?.correct || {}).length,
+    [quizData?.correct]
+  );
+
+  const wrongCount = useMemo(
+    () => Object.keys(quizData?.wrong || {}).length,
+    [quizData?.wrong]
+  );
+
+  const accuracy = useMemo(() => {
+    const total = quizData?.totalQuestions || 1;
+    return (correctCount / total) * 100;
+  }, [correctCount, quizData?.totalQuestions]);
+
+  if (isLoading || !quizData || Object.keys(quizData).length === 0) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+        <p className="text-lg text-gray-600">Loading Quiz Analysis...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 px-4 py-8 font-sans text-gray-800">
@@ -56,20 +60,14 @@ const QuizAnalysis: React.FC = () => {
       <div className="bg-blue-100 p-6 rounded-xl shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
           <div>
-            <h1 className="text-2xl font-bold mb-1">{category}</h1>
+            <h1 className="text-2xl font-bold mb-1">{quizData?.category}</h1>
             <p className="text-sm text-blue-800">
-              📄 {totalQuestions} Questions • {totalMarks} Marks • {timeLimit}{" "}
-              Minutes
+              {quizData?.totalQuestions} Questions • {quizData?.totalQuestions}{" "}
+              Marks • {quizData?.timeLimit} Minutes
             </p>
           </div>
           <div className="flex gap-4 mt-4 sm:mt-0">
-            <Button
-              onClick={handleReattempt}
-            
-              className="px-5 py-2 border border-blue-600 text-blue-600 rounded-full hover:bg-blue-200 transition"
-            >
-              Reattempt
-            </Button>
+           
             <Button
               onClick={handleReview}
               className="px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
@@ -91,7 +89,7 @@ const QuizAnalysis: React.FC = () => {
           />
         </div>
         <p className="text-4xl font-bold text-blue-700 mb-6">
-          {score}/{totalMarks}
+          {correctCount}/{quizData?.totalQuestions}
         </p>
 
         {/* Progress Bars */}
@@ -99,28 +97,28 @@ const QuizAnalysis: React.FC = () => {
           <ProgressBar
             icon={<FaCheckCircle className="text-green-600" />}
             label="Correct"
-            value={correct ?? 0}
-            max={totalQuestions}
+            value={correctCount}
+            max={quizData?.totalQuestions ?? 0}
           />
           <ProgressBar
             icon={<FaTimesCircle className="text-red-500" />}
             label="Incorrect"
-            value={incorrect ?? 0}
-            max={totalQuestions}
+            value={wrongCount}
+            max={quizData?.totalQuestions ?? 0}
           />
           <ProgressBar
             icon={<FaBullseye className="text-yellow-500" />}
             label="Accuracy"
-            value={accuracy ?? 0}
+            value={accuracy}
             max={100}
             percent
           />
           <ProgressBar
             icon={<FaClock className="text-blue-600" />}
             label="Time Taken"
-            value={timeTaken ?? 0}
-            max={timeLimit}
-            valueText={`${timeTaken ?? 0} mins`}
+            value={quizData?.timeTaken ?? 0}
+            max={quizData?.timeLimit ?? 0}
+            valueText={`${quizData?.timeTaken ?? 0} mins`}
           />
         </div>
       </div>

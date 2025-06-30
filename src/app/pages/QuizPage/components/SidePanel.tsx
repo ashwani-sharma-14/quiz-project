@@ -1,8 +1,11 @@
+import React from "react";
+
 interface Question {
-  id: number;
+  id: string;
   question: string;
   options: string[];
 }
+
 interface Props {
   questions: Question[];
   currentIndex: number;
@@ -10,12 +13,12 @@ interface Props {
   setCurrentIndex: (index: number) => void;
 }
 
-const SidePanel = ({
+const SidePanel: React.FC<Props> = ({
   questions,
   currentIndex,
   questionStatus,
   setCurrentIndex,
-}: Props) => {
+}) => {
   return (
     <div className="bg-white shadow-md p-4 rounded-md w-full md:w-72">
       <h3 className="font-semibold text-lg mb-4 text-center">

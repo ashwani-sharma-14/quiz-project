@@ -13,21 +13,21 @@ const InstructionPage: React.FC<InstructionPageProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="w-full h-[calc(100vh-8rem)] max-w-4xl bg-white rounded-3xl shadow-xl flex flex-col overflow-hidden border border-gray-200 hide-scrollbar">
+    <div className="w-full max-w-4xl mx-auto h-full bg-white rounded-3xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-100 bg-blue-100 rounded-t-3xl">
-        <h1 className="text-2xl font-bold text-center text-blue-700">
-          General Instructions
+      <div className="px-8 py-5 bg-gradient-to-r from-blue-100 to-blue-200 border-b border-gray-200 rounded-t-3xl">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-center text-blue-700">
+          📝 General Instructions
         </h1>
       </div>
 
-      {/* Instructions */}
-      <div className="px-6 sm:px-10 py-8 overflow-y-auto max-h-16rem scroll-smooth hide-scrollbar">
-        <div className="text-gray-800 space-y-4">
-          <h2 className="text-md font-semibold text-gray-700">
+      {/* Instruction Content */}
+      <div className="flex-1 px-8 sm:px-10 py-6 overflow-y-auto scroll-smooth hide-scrollbar">
+        <div className="text-gray-800 space-y-5 text-[15px] leading-relaxed">
+          <p className="font-semibold text-lg">
             Please read the instructions carefully:
-          </h2>
-          <ol className="list-decimal list-inside space-y-3 text-base text-gray-700">
+          </p>
+          <ol className="list-decimal list-inside space-y-4">
             <li>
               Total duration of the test is <strong>60 minutes</strong>.
             </li>
@@ -64,21 +64,21 @@ const InstructionPage: React.FC<InstructionPageProps> = ({
       </div>
 
       {/* Footer Buttons */}
-      <div className="flex justify-between items-center px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-3xl">
+      <div className="flex justify-between items-center px-6 py-5 bg-gray-100 border-t border-gray-200 rounded-b-3xl">
         <button
           onClick={() => navigate(-1)}
-          className="px-5 py-2 bg-gray-300 text-gray-800 font-medium rounded-full hover:bg-gray-400 transition"
+          className="px-6 py-2 text-sm md:text-base bg-gray-300 text-gray-800 font-medium rounded-full hover:bg-gray-400 transition"
         >
-          Back
+          ← Back
         </button>
         <button
           onClick={() => {
             setShowInstruction(false);
             setSecurity(true);
           }}
-          className="px-5 py-2 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 transition"
+          className="px-6 py-2 text-sm md:text-base bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition"
         >
-          Next
+          Start Quiz →
         </button>
       </div>
     </div>

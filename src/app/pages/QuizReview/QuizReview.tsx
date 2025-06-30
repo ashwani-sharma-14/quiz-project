@@ -7,9 +7,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const ReviewPage = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { quizId } = useParams();
+  const { id } = useParams();
+  const quizId = id;
 
   const fetchQuiz = useQuizStore((state) => state.fetchQuiz);
   const fetchQuizData = useQuizStore((state) => state.fetchQuizState);
@@ -22,28 +23,32 @@ const ReviewPage = () => {
 
   if (!fetchQuizData) {
     return (
-      <div className="text-center mt-10 text-gray-600">Loading analysis...</div>
+      <div className="text-center mt-10 text-gray-600">Loading Review...</div>
     );
   }
 
   const { category, topics, difficulty, correct, wrong, quizQuestions } =
     fetchQuizData;
 
-  // Flatten the questions from nested structure
-  const questions = quizQuestions.map((q) => ({
-    id: q.questions.id,
-    question: q.questions.question,
-    options: q.questions.options,
-    correctAnswer: correct.find((c) => c.questionId === q.questions.id)
-      ? q.questions.options.find(() => true) ?? ""
-      : "", // Optional fallback
-    selectedAnswer: correct.find((c) => c.questionId === q.questions.id)
-      ? q.questions.options.find(() => true) ?? ""
-      : wrong.find((w) => w.questionId === q.questions.id)
-      ? q.questions.options.find(() => false) ?? ""
-      : null,
-  }));
-  
+  const questions = quizQuestions.map((q, index) => {
+    const isCorrect = correct.find((c) => c.questionId === q.questionId);
+    const isWrong = wrong.find((w) => w.questionId === q.questionId);
+
+    const correctAnswer = q.questions.options[q.questions.correctAns];
+    const selectedAnswer = isCorrect
+      ? correctAnswer
+      : isWrong
+      ? q.questions.options.find((opt) => opt !== correctAnswer) // assuming user chose something else
+      : null;
+
+    return {
+      id: q.questions.id,
+      question: q.questions.question,
+      options: Object.values(q.questions.options), // convert {A,B,C,D} to array
+      correctAnswer,
+      selectedAnswer,
+    };
+  });
 
   const currentQuestion = questions[currentIndex];
 
@@ -60,12 +65,12 @@ const ReviewPage = () => {
   };
 
   const questionResults = questions.map((q) => ({
-    isCorrect: q.selectedAnswer === "correct",
+    isCorrect: q.selectedAnswer === q.correctAnswer,
   }));
-    
-    const handleFinish = () => {
-        toast.success("Review completed successfully!");
-        navigate(-1);//redirect to one page back
+
+  const handleFinish = () => {
+    toast.success("Review completed successfully!");
+    navigate(-1);
   };
 
   return (
@@ -86,7 +91,7 @@ const ReviewPage = () => {
         <QuestionPanel
           question={currentQuestion}
           onNext={onNext}
-        onPrev={onPrev}
+          onPrev={onPrev}
           isLastQuestion={currentIndex === questions.length - 1}
           onFinish={handleFinish}
         />

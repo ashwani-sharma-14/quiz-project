@@ -2,28 +2,24 @@ import { create } from "zustand";
 import axiosInstance from "../utils/clientApiInstace";
 
 interface Quiz {
-  userQuizData: {
-    userQuizId: string;
-    category: string;
-    topics: string[];
-    difficulty: string;
-    totalQuestions: number;
-    timeLimit: number;
-    correct: number | null;
-    incorrect: number | null;
-    accuracy: number | null;
-    timeTaken: number | null;
-    score: number | null;
-  };
-  questions: {
-    id: number;
-    question: string;
-    options: string[];
-    difficulty: string;
-    topicId: number;
-    selectedAnswer?: string | null;
-    isCorrect?: boolean | null;
-  }[];
+
+        questions: {
+            id: string;
+            question: string;
+            options: string[];
+            correctAnswer: string;
+        }[];
+        userQuizData: {
+            category: string;
+            difficulty: string;
+            mode: "examMode";
+            timeLimit: number;
+            topics: string[];
+            totalQuestions: number;
+            userId: string;
+        };
+        userQuizId: string;
+    
 }
 interface fetchQuiz {
     id: string;
@@ -34,9 +30,8 @@ interface fetchQuiz {
     totalQuestions: number;
     timeLimit: number;
     score: number | null;
-    correctCount: number | null;
-    incorrectCount: number | null;
-    accuracy: number | null;
+    correct: object | null;
+    wrong: object | null;
     timeTaken: number | null;
     createdAt: Date;
     updatedAt: Date;
@@ -52,11 +47,11 @@ interface fetchQuiz {
       };
     }[];
   
-    correct: {
+    correctQuestions: {
       questionId: number;
     }[];
   
-    wrong: {
+    wrongQuestions: {
       questionId: number;
     }[];
   
@@ -87,7 +82,7 @@ interface QuizStore {
   createQuiz: (quizData: CreateQuizData) => Promise<void>;
   updateQuiz: (quizData: AnswerSubmission) => Promise<void>;
   fetchQuiz: (quizId: string) => Promise<void>;
-  getAllQuizzes: (userId: string) => Promise<void>;
+  getAllQuizzes: () => Promise<void>;
   getCategoryAndTopicsData: () => Promise<void>;
   theme: string;
   setTheme: (newTheme: string) => void;
@@ -102,7 +97,7 @@ interface CreateQuizData {
 
 interface AnswerSubmission {
   userQuizId: string;
-  remeningTime: number;
+  timeTaken: number;
   answers: {
     questionId: string;
     selectedAnswer: string;
@@ -132,12 +127,12 @@ export const useQuizStore = create<QuizStore>((set) => ({
         difficulty: quizData.difficulty,
         totalQuestions: quizData.totalQuestions.toString(),
         timeLimit: quizData.timeLimit.toString(),
-        mode: "examMode", // added static mode
+        mode: "examMode",
       }).toString();
 
       const response = await axiosInstance.get(`/quiz/newquiz?${queryParams}`);
       set({
-        createQuizState: response.data,
+        createQuizState: response.data.data,
         isCreatingQuiz: false,
       });
     } catch (error) {
@@ -202,8 +197,9 @@ export const useQuizStore = create<QuizStore>((set) => ({
     set({ isCheckingQuiz: true, error: null });
     try {
       const response = await axiosInstance.get(`/quiz/${quizId}`);
+    
       set({
-        fetchQuizState: response.data,
+        fetchQuizState: response.data.quiz,
         isCheckingQuiz: false,
       });
     } catch (error) {
@@ -230,12 +226,12 @@ export const useQuizStore = create<QuizStore>((set) => ({
     }
   },
 
-  getAllQuizzes: async (userId: string) => {
+  getAllQuizzes: async () => {
     set({ isCheckingQuiz: true, error: null });
     try {
-      const response = await axiosInstance.get(`/user/${userId}`);
+      const response = await axiosInstance.get(`/quiz/userQuiz`);
       set({
-        fetchQuizState: response.data,
+        quizList: response.data.quizzes,
         isCheckingQuiz: false,
       });
     } catch (error) {

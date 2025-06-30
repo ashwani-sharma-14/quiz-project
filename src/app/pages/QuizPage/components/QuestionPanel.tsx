@@ -2,7 +2,7 @@ import React from "react";
 
 interface Props {
   question: {
-    id: number;
+    id: string;
     question: string;
     options: string[];
   };
@@ -23,28 +23,29 @@ const QuestionPanel: React.FC<Props> = ({
   onSaveMarkForReview,
   setShowSummary,
 }) => {
-  const renderOption = (option: string, idx: number) => (
+
+  
+
+  const renderOption = (value: string) => (
     <label
-      key={idx}
+      key={value}
       className="block p-3 rounded cursor-pointer bg-gray-100 hover:bg-gray-200"
     >
       <input
         type="radio"
         name={`question-${question.id}`}
-        value={option}
-        checked={selectedOption === option}
-        onChange={() => onOptionChange(option)}
+        value={value}
+        checked={selectedOption === value}
+        onChange={() => onOptionChange(value)}
         className="mr-2"
       />
-      {option}
+      {value}
     </label>
   );
 
   return (
     <div className="flex-1 bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        Q{question.id}. {question.question}
-      </h2>
+      <h2 className="text-lg font-semibold mb-4">Q. {question.question}</h2>
 
       <div className="space-y-3 mb-4">{question.options.map(renderOption)}</div>
 
