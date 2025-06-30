@@ -62,6 +62,7 @@ const generateQuiz = async (config: QuizConfig) => {
 
   let selected: any[] = [];
   const isDifficultyArray = Array.isArray(difficulty);
+  const questionIdSet = new Set<string>();
 
   for (let i = 0; i < topicIds.length; i++) {
     const numQuestions = perTopic + (i < remainder ? 1 : 0);
@@ -77,7 +78,16 @@ const generateQuiz = async (config: QuizConfig) => {
     });
 
     const shuffled = questions.sort(() => 0.5 - Math.random());
-    selected = selected.concat(shuffled.slice(0, numQuestions));
+    for (const q of shuffled) {
+      if (
+        !questionIdSet.has(q.id) &&
+        selected.length < (i + 1) * numQuestions
+      ) {
+        selected.push(q);
+        questionIdSet.add(q.id);
+      }
+      if (selected.length >= totalQuestions) break;
+    }
   }
 
   if (selected.length === 0) {
