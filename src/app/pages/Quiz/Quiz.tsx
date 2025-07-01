@@ -1,6 +1,11 @@
+import QuizSkeleton from "@/components/skeleton/QuizSkeleton";
+import { Input } from "@/components/ui/input";
 import { useQuizStore } from "@/store/useQuizStore";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+// inside your component before render return
+
 
 const Quiz = () => {
   const [step, setStep] = useState(1);
@@ -92,13 +97,13 @@ const Quiz = () => {
               {topicsMap[selectedCategoryId]?.map(({ id, name }) => (
                 <label
                   key={id}
-                  className="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200 hover:shadow transition"
+                  className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-gray-200 hover:shadow transition"
                 >
                   <input
                     type="checkbox"
                     checked={selectedTopicIds.includes(id)}
                     onChange={() => toggleTopic(id)}
-                    className="accent-blue-600 w-4 h-4"
+                    className="accent-blue-600 rounded-full"
                   />
                   <span className="text-gray-700 font-medium">{name}</span>
                 </label>
@@ -109,17 +114,18 @@ const Quiz = () => {
 
       case 3:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <h2 className="text-2xl font-semibold text-gray-800">
               Set Quiz Preferences
             </h2>
 
+            {/* Difficulty Selector */}
             <div className="space-y-4">
               <label className="block text-gray-600 font-semibold mb-2">
                 Difficulty
               </label>
               <div className="flex flex-wrap gap-3">
-                {["Mixed", "Easy", "Medium", "Hard"].map((level) => (
+                {["Easy", "Medium", "Hard"].map((level) => (
                   <button
                     key={level}
                     onClick={() => setDifficulty(level)}
@@ -135,28 +141,58 @@ const Quiz = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-gray-600 font-semibold mb-2">
-                Number of Questions
-              </label>
-              <input
-                type="number"
-                value={questions==0?"":questions}
-                onChange={(e) => setQuestions(Number(e.target.value))}
-                className="w-full border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            {/* Question & Time Inputs Row */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <label className="block text-gray-600 font-semibold mb-2">
+                  Number of Questions (Max 30)
+                </label>
+                <Input
+                  type="number"
+                  value={questions === 0 ? "" : questions}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (!isNaN(val)) {
+                      if (val > 30) setQuestions(30);
+                      else setQuestions(val);
+                    }
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown"].includes(e.key))
+                      e.preventDefault();
+                  }}
+                  className="rounded-full no-spinner border-gray-200"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                />
+              </div>
 
-            <div>
-              <label className="block text-gray-600 font-semibold mb-2">
-                Time Limit (minutes)
-              </label>
-              <input
-                type="number"
-                value={time==0?"":time}
-                onChange={(e) => setTime(Number(e.target.value))}
-                className="w-full border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              {/* Time Limit */}
+              <div className="flex-1">
+                <label className="block text-gray-600 font-semibold mb-2">
+                  Time Limit (Max 120 minutes)
+                </label>
+                <Input
+                  type="number"
+                  value={time === 0 ? "" : time}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (!isNaN(val)) {
+                      if (val > 120) setTime(120);
+                      else setTime(val);
+                    }
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown"].includes(e.key))
+                      e.preventDefault();
+                  }}
+                  className="rounded-full no-spinner border-gray-200"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                />
+              </div>
             </div>
           </div>
         );
@@ -165,10 +201,14 @@ const Quiz = () => {
         return null;
     }
   };
+
+  if (!categoryAndTopics || Object.keys(categoryMap).length === 0) {
+    return <QuizSkeleton />;
+  }
   
 
   return (
-    <div className="h-[calc(100vh-6rem)] bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden">
+    <div className="h-[calc(100vh-4rem)] bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden">
       <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl flex flex-col p-6 sm:p-8 h-[calc(30rem)] space-y-4 border border-gray-200">
         <h1 className="text-3xl font-extrabold text-blue-700">
           Start New Practice
@@ -245,4 +285,4 @@ const Quiz = () => {
   );
 };
 
-export default Quiz;
+export default Quiz; 

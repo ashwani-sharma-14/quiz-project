@@ -1,9 +1,11 @@
+import type React from "react";
+
 // Reusable Section Component
 export const Section = ({
   title,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
 }) => (
   <div className="mb-8">

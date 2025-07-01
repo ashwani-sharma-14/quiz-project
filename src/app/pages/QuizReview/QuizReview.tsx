@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 import QuizHeader from "./components/QuizHeader";
 import SidePanel from "./components/SidePanel";
 import QuestionPanel from "./components/QuestionPanel";
 import { useQuizStore } from "@/store/useQuizStore";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
+import QuizHeaderSkeleton from "@/components/skeleton/QuizHeaderSkeleton";
+import QuestionPanelSkeleton from "@/components/skeleton/QuestionPanelSkeleton";
+import SidePanelSkeleton from "@/components/skeleton/SidePanelSkeleton";
 
 const ReviewPage = () => {
   const navigate = useNavigate();
@@ -15,14 +18,18 @@ const ReviewPage = () => {
   const fetchQuizData = useQuizStore((state) => state.fetchQuizState);
 
   useEffect(() => {
-    if (id) {
-      fetchQuiz(id);
-    }
+    if (id) fetchQuiz(id);
   }, [id]);
 
   if (!fetchQuizData) {
     return (
-      <div className="text-center mt-10 text-gray-600">Loading Review...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-4 md:p-6">
+        <QuizHeaderSkeleton />
+        <div className="flex flex-col md:flex-row gap-4 mt-4">
+          <QuestionPanelSkeleton />
+          <SidePanelSkeleton />
+        </div>
+      </div>
     );
   }
 
@@ -57,19 +64,14 @@ const ReviewPage = () => {
   };
 
   return (
-    <>
+    
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-4 md:p-6">
       <QuizHeader
         category={category}
         topics={topics.join(", ")}
         difficulty={difficulty}
       />
-      <div className="flex flex-col md:flex-row gap-4 p-4">
-        <SidePanel
-          questions={questions}
-          currentIndex={currentIndex}
-          questionResults={questionResults}
-          setCurrentIndex={setCurrentIndex}
-        />
+      <div className="flex flex-col md:flex-row gap-6 mt-6">
         <QuestionPanel
           question={currentQuestion}
           onPrev={() => setCurrentIndex((i) => Math.max(i - 1, 0))}
@@ -79,8 +81,14 @@ const ReviewPage = () => {
           isLastQuestion={currentIndex === questions.length - 1}
           onFinish={handleFinish}
         />
+        <SidePanel
+          questions={questions}
+          currentIndex={currentIndex}
+          questionResults={questionResults}
+          setCurrentIndex={setCurrentIndex}
+        />
       </div>
-    </>
+    </div>
   );
 };
 

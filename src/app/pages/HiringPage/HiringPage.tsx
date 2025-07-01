@@ -1,10 +1,17 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MapPin, BadgeIndianRupee } from "lucide-react";
 import { Section } from "@/components/reusable/Section";
 import { useHiringStore } from "@/store/useHiringStore";
-import SkeletonCard from "@/components/ui/SkeletonCard";
+import {
+  MapPin,
+  BadgeIndianRupee,
+  ScrollText,
+  Wrench,
+  GraduationCap,
+  Building2,
+} from "lucide-react";
+import { SkeletonDetailCard } from "@/components/skeleton/SkeletonDetailCard";
 
 const HiringPage = () => {
   const { id } = useParams();
@@ -16,15 +23,17 @@ const HiringPage = () => {
     if (id) hiringById(id);
   }, [id]);
 
-  // Show loading skeleton while fetching
+  // ✅ Skeleton View
   if (loading) {
-    return <SkeletonCard />;
+    return (
+      <SkeletonDetailCard />
+    );
   }
 
-
+  // ✅ Real Data View
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-8 border border-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-8">
         {/* Header */}
         <div className="flex gap-4 items-center mb-10">
           <img
@@ -33,7 +42,9 @@ const HiringPage = () => {
             className="w-16 h-16 rounded-xl border border-gray-200 shadow"
           />
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">{job?.jobTitle}</h1>
+            <h1 className="text-3xl font-bold text-gray-800">
+              {job?.jobTitle}
+            </h1>
             <p className="text-gray-600 text-base">{job?.companyName}</p>
           </div>
         </div>
@@ -54,7 +65,7 @@ const HiringPage = () => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm"
+              className="flex items-center gap-3 bg-white rounded-xl p-4 shadow"
             >
               {item.icon}
               <div>
@@ -67,21 +78,33 @@ const HiringPage = () => {
 
         <hr className="my-8 border-gray-200" />
 
-        {/* job? Description */}
-        <Section title="🧾 job? Description">
+        {/* Job Description */}
+        <Section
+          title={
+            <div className="flex items-center gap-2 text-gray-700 text-lg font-semibold">
+              <ScrollText /> Job Description
+            </div>
+          }
+        >
           <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
             {job?.jobDescription}
           </p>
         </Section>
 
         {/* Required Skills */}
-        <Section title="🛠️ Required Skills">
+        <Section
+          title={
+            <div className="flex items-center gap-2 text-gray-700 text-lg font-semibold">
+              <Wrench /> Required Skills
+            </div>
+          }
+        >
           <div className="flex flex-wrap gap-2">
             {["AWS", "Next.js", "Node.js", "React", "React Native"].map(
               (skill) => (
                 <span
                   key={skill}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold border border-blue-300"
+                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold"
                 >
                   {skill}
                 </span>
@@ -91,7 +114,13 @@ const HiringPage = () => {
         </Section>
 
         {/* Eligibility */}
-        <Section title="🎓 Eligibility Criteria">
+        <Section
+          title={
+            <div className="flex items-center gap-2 text-gray-700 text-lg font-semibold">
+              <GraduationCap /> Eligibility Criteria
+            </div>
+          }
+        >
           <ul className="list-disc pl-6 text-sm text-gray-700 space-y-2">
             <li>Final year graduation (B.Tech/B.E. or equivalent)</li>
             <li>Full-time availability post-academics</li>
@@ -105,7 +134,13 @@ const HiringPage = () => {
         </Section>
 
         {/* About Company */}
-        <Section title={`🏢 About ${job?.companyName}`}>
+        <Section
+          title={
+            <div className="flex items-center gap-2 text-gray-700 text-lg font-semibold">
+              <Building2 /> About {job?.companyName}
+            </div>
+          }
+        >
           <p className="text-sm text-gray-700 leading-relaxed">
             Kapidron is a tech-driven startup specializing in AI-based
             solutions, modern UI/UX, and scalable full-stack applications. They
@@ -117,14 +152,12 @@ const HiringPage = () => {
         {/* Apply Button */}
         <div className="mt-10">
           <Button
-            className="w-full py-3 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition"
-            onClick={() => {
-              if (job?.applyLink) {
-                window.open(job?.applyLink, "_blank");
-              }
-            }}
+            className="w-full py-3 text-lg font-semibold rounded-2xl text-white bg-blue-600 hover:bg-blue-700 "
+            onClick={() =>
+              job?.applyLink && window.open(job.applyLink, "_blank")
+            }
           >
-            🚀 Apply Now
+            Apply Now
           </Button>
         </div>
       </div>

@@ -45,7 +45,7 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 ml-0 md:ml-64 h-[calc(100vh-4rem)] overflow-y-auto p-4 hide-scrollbar">
+        <main className="flex-1 ml-0 md:ml-64 h-[calc(100vh-4rem)] overflow-y-auto hide-scrollbar">
           {children}
         </main>
       </div>

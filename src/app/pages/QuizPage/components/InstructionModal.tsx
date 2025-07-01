@@ -13,11 +13,11 @@ const InstructionPage: React.FC<InstructionPageProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="w-full max-w-4xl mx-auto h-full bg-white rounded-3xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto h-[calc(100vh-3rem)] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="px-8 py-5 bg-gradient-to-r from-blue-100 to-blue-200 border-b border-gray-200 rounded-t-3xl">
+      <div className="px-8 py-5  border-b border-gray-200 rounded-t-2xl">
         <h1 className="text-2xl md:text-3xl font-extrabold text-center text-blue-700">
-          📝 General Instructions
+          General Instructions
         </h1>
       </div>
 
@@ -29,19 +29,12 @@ const InstructionPage: React.FC<InstructionPageProps> = ({
           </p>
           <ol className="list-decimal list-inside space-y-4">
             <li>
-              Total duration of the test is <strong>60 minutes</strong>.
-            </li>
-            <li>
-              The test contains <strong>10 multiple choice questions</strong>{" "}
-              from <strong>Numbers, Profit and Loss, Probability</strong>.
-            </li>
-            <li>
               There is only <strong>one correct response</strong> for each
               question.
             </li>
             <li>
               <strong>1 mark</strong> will be awarded for each correct answer.
-              Maximum marks are <strong>10</strong>.
+              <strong>No negative marking</strong> 
             </li>
             <li>
               Once the quiz starts, you will enter{" "}
@@ -64,7 +57,7 @@ const InstructionPage: React.FC<InstructionPageProps> = ({
       </div>
 
       {/* Footer Buttons */}
-      <div className="flex justify-between items-center px-6 py-5 bg-gray-100 border-t border-gray-200 rounded-b-3xl">
+      <div className="flex justify-between items-center px-6 py-5  border-t border-gray-200 rounded-b-3xl">
         <button
           onClick={() => navigate(-1)}
           className="px-6 py-2 text-sm md:text-base bg-gray-300 text-gray-800 font-medium rounded-full hover:bg-gray-400 transition"

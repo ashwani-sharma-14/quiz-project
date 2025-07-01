@@ -6,28 +6,21 @@ import {
   RouterProvider,
   Outlet,
 } from "react-router-dom";
-import { lazy, Suspense } from "react";
+
 import BaseLayout from "@/app/layouts/BaseLayout";
 import AuthProvider from "@/app/providers/AuthProvider";
 
-const Home = lazy(() => import("@/app/pages/Home/Home"));
-const Quiz = lazy(() => import("@/app/pages/Quiz/Quiz"));
-const HiringUpdates = lazy(() => import("@/app/pages/Hiring/Hiring"));
-const HiringPage = lazy(
-  () => import("@/app/pages/Hiring/HiringPage/HiringPage")
-);
-const About = lazy(() => import("@/app/pages/About/About"));
-
-const QuizPage = lazy(() => import("@/app/pages/QuizPage/QuizPage"));
-const QuizAnalysis = lazy(
-  () => import("@/app/pages/QuizAnalysis/QuizAnalysis")
-);
-const QuizReview = lazy(() => import("@/app/pages/QuizReview/QuizReview"));
-const PreviousQuizzes = lazy(
-  () => import("@/app/pages/PreviousQuizzes/PreviousQuizzes")
-);
-const Login = lazy(() => import("@/app/pages/Login/Login"));
-const Signup = lazy(() => import("@/app/pages/SignUp/Signup"));
+import Home from "@/app/pages/Home/Home";
+import Quiz from "@/app/pages/Quiz/Quiz";
+import HiringUpdates from "@/app/pages/Hiring/Hiring";
+import HiringPage from "@/app/pages/HiringPage/HiringPage";
+import About from "@/app/pages/About/About";
+import QuizPage from "@/app/pages/QuizPage/QuizPage";
+import QuizAnalysis from "@/app/pages/QuizAnalysis/QuizAnalysis";
+import QuizReview from "@/app/pages/QuizReview/QuizReview";
+import PreviousQuizzes from "@/app/pages/PreviousQuizzes/PreviousQuizzes";
+import Login from "@/app/pages/Login/Login";
+import Signup from "@/app/pages/SignUp/Signup";
 
 export default function Routes() {
   const router = createBrowserRouter(
@@ -41,30 +34,9 @@ export default function Routes() {
         }
       >
         {/* Public routes - no BaseLayout */}
-        <Route
-          path="/login"
-          element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <Login />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/sign-up"
-          element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <Signup />
-            </Suspense>
-          }
-        />
-        <Route
-          path="quiz/quizScreen"
-          element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <QuizPage />
-            </Suspense>
-          }
-        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/sign-up" element={<Signup />} />
+        <Route path="quiz/quizScreen" element={<QuizPage />} />
 
         {/* Protected routes - with BaseLayout */}
         <Route
@@ -75,72 +47,14 @@ export default function Routes() {
             </BaseLayout>
           }
         >
-          <Route
-            index
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <Home />
-              </Suspense>
-            }
-          />
-          <Route
-            path="quiz"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <Quiz />
-              </Suspense>
-            }
-          />
-
-          <Route
-            path="quiz/:id/analysis"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <QuizAnalysis />
-              </Suspense>
-            }
-          />
-          <Route
-            path="quiz/:id/review"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <QuizReview />
-              </Suspense>
-            }
-          />
-          <Route
-            path="previousQuizzes"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <PreviousQuizzes />
-              </Suspense>
-            }
-          />
-          <Route
-            path="hiring"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <HiringUpdates />
-              </Suspense>
-            }
-          />
-          <Route
-            path="hiring/:id"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <HiringPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="developer"
-            element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <About />
-              </Suspense>
-            }
-          />
-         
+          <Route index element={<Home />} />
+          <Route path="quiz" element={<Quiz />} />
+          <Route path="quiz/:id/analysis" element={<QuizAnalysis />} />
+          <Route path="quiz/:id/review" element={<QuizReview />} />
+          <Route path="previousQuizzes" element={<PreviousQuizzes />} />
+          <Route path="hiring" element={<HiringUpdates />} />
+          <Route path="hiring/:id" element={<HiringPage />} />
+          <Route path="developer" element={<About />} />
         </Route>
       </Route>
     )

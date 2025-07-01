@@ -5,6 +5,7 @@ import QuizHeader from "./components/QuizHeader";
 import QuestionPanel from "./components/QuestionPanel";
 import SidePanel from "./components/SidePanel";
 import InstructionModal from "./components/InstructionModal";
+import InstructionPopup from "./components/InstructionPopup";
 import SubmissionStatus from "./components/SubmissionStatus";
 import SecurityAlert from "@/components/reusable/SecurityAlert";
 import { useQuizStore } from "@/store/useQuizStore";
@@ -50,6 +51,7 @@ const QuizPage = () => {
 
   const quizTimeInSeconds = (Number(timeLimit) || 30) * 60;
   const [remainingTime, setRemainingTime] = useState(quizTimeInSeconds);
+  const [instructionPopUpOpen, setInstructionPopUpOpen] = useState(false);
 
   const handleFinalSubmit = () => {
     deactivateSecurityHooks();
@@ -92,20 +94,24 @@ const QuizPage = () => {
   }, [security]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          toast.error("Time's up! Submitting the quiz.");
-          handleFinalSubmit();
-          setShowSummary(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [answers]);
+    if (!showInstruction && security) {
+      const timer = setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            toast.error("Time's up! Submitting the quiz.");
+            handleFinalSubmit();
+            setShowSummary(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [showInstruction, security]);
+  
 
   useEffect(() => {
     setSelectedOption(answers[currentIndex]);
@@ -141,6 +147,10 @@ const QuizPage = () => {
     }
   };
 
+  const onClosePopUp = () => {
+    setInstructionPopUpOpen(false);
+  }
+
   return (
     <div className="h-full bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden md:overflow-auto md:p-6 hide-scrollbar">
       {showInstruction ? (
@@ -149,7 +159,10 @@ const QuizPage = () => {
           setSecurity={setSecurity}
         />
       ) : (
-        <>
+          <div>
+            {instructionPopUpOpen && (
+              <InstructionPopup onClose={onClosePopUp} />
+            )}
           {alertMessage && (
             <SecurityAlert
               message={alertMessage}
@@ -191,7 +204,7 @@ const QuizPage = () => {
             topics={topics ? topics.join(", ") : ""}
             difficulty={difficulty ?? ""}
             remainingTime={remainingTime}
-            onViewInstructions={() => setShowInstruction(true)}
+            onViewInstructions={() => setInstructionPopUpOpen(true)}
           />
 
           <div className="flex flex-col md:flex-row gap-4 mt-4">
@@ -242,7 +255,7 @@ const QuizPage = () => {
               onClose={() => setShowSummary(false)}
             />
           )}
-        </>
+        </div>
       )}
     </div>
   );

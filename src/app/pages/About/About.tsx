@@ -1,3 +1,4 @@
+import React from "react";
 import logo from "@/assets/logo.jpg";
 
 const teamData = [
@@ -33,63 +34,69 @@ const teamData = [
 
 const TeamSection = () => {
   return (
-    <section className="pt-10 pb-16 bg-gradient-to-b from-white to-blue-50">
-      <h2 className="text-4xl font-bold text-center text-blue-800 mb-4">
-        🚀 Development Team
-      </h2>
-      <p className="text-center text-gray-600 max-w-2xl mx-auto mb-10">
-        Meet the passionate developers behind the product – committed to
-        building performant, scalable, and delightful user experiences.
-      </p>
+    <section className="h-[calc(100vh-4rem)] bg-gradient-to-b from-white to-blue-50 flex items-center">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 w-full">
+        {/* Heading */}
+        <div className="text-center mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-4xl font-bold text-blue-800 mb-2">
+            Meet Our Development Team
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
+            Passionate engineers crafting high-performance, scalable and
+            delightful digital experiences with modern web technologies.
+          </p>
+        </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-6">
-        {teamData.map((member, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-3xl shadow-lg overflow-hidden text-center transform transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-          >
+        {/* Team Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+          {teamData.map((member, index) => (
             <div
-              className={`h-28 rounded-t-3xl bg-gradient-to-r ${member.gradient}`}
-            ></div>
-            <div className="-mt-14">
-              <img
-                src={member.image}
-                alt={member.name}
-                className="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-md object-cover"
+              key={index}
+              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-transform hover:-translate-y-1 duration-300 w-full max-w-sm mx-auto"
+            >
+              <div
+                className={`h-16 md:h-20 rounded-t-2xl bg-gradient-to-r ${member.gradient}`}
               />
-            </div>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-800">
-                {member.name}
-              </h3>
-              <p className="text-sm text-gray-500">{member.degree}</p>
-              <p className="text-sm text-blue-700 mt-1 font-medium">
-                {member.role}
-              </p>
-              <p className="text-gray-600 text-sm mt-3 leading-relaxed">
-                {member.desc}
-              </p>
-
-              <div className="flex justify-center gap-4 mt-4">
-                {member.socials.map((s, i) => (
-                  <a
-                    key={i}
-                    href={s.link}
-                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-blue-100 text-lg transition"
-                  >
-                    {s.icon}
-                  </a>
-                ))}
+              <div className="relative -mt-12 flex justify-center">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white shadow-md object-cover"
+                />
               </div>
+              <div className="p-4 md:p-6 text-center">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-800">
+                  {member.name}
+                </h3>
+                <p className="text-sm text-gray-500">{member.degree}</p>
+                <p className="text-sm text-blue-700 mt-1 font-medium">
+                  {member.role}
+                </p>
+                <p className="text-gray-600 text-sm mt-2 leading-relaxed">
+                  {member.desc}
+                </p>
 
-              <button
-                className={`mt-6 px-6 py-2 rounded-full text-white font-medium text-sm bg-gradient-to-r ${member.gradient} hover:brightness-110 transition`}
-              >
-                {member.button}
-              </button>
+                <div className="flex justify-center gap-3 mt-4">
+                  {member.socials.map((s, i) => (
+                    <a
+                      key={i}
+                      href={s.link}
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-blue-100 text-lg transition-colors"
+                    >
+                      {s.icon}
+                    </a>
+                  ))}
+                </div>
+
+                <button
+                  className={`mt-4 px-4 py-2 rounded-full text-white font-medium text-sm bg-gradient-to-r ${member.gradient} hover:scale-105 transition-transform`}
+                >
+                  {member.button}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
