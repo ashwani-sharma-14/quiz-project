@@ -2,6 +2,7 @@ import { asyncWrap } from "@/utils/asyncWrap";
 import { Request, Response } from "express";
 import { Difficulty } from "@/generated/prisma";
 import { quizService } from "./quiz.service";
+
 const generateQuiz = asyncWrap(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   if (!userId) {
@@ -35,11 +36,15 @@ const generateQuiz = asyncWrap(async (req: Request, res: Response) => {
     timeLimit: Number(timeLimit),
     mode: String(mode),
   });
-  return res.json({ message: "quiz created", data });
+  return res.json({ message: "quiz generated", data });
 });
 
 const submitQuiz = asyncWrap(async (req: Request, res: Response) => {
-  const result = await quizService.submitQuiz(req.body);
+  const userId = req.user?.userId || req.user?.id;
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+  const result = await quizService.submitQuiz({ ...req.body, userId });
   return res.json({ message: "quiz submitted", result });
 });
 
@@ -60,7 +65,7 @@ const getUserQuizById = asyncWrap(async (req: Request, res: Response) => {
   }
 
   const quiz = await quizService.getUserQuizById(quizId);
-  
+
   res.json({ quiz });
 });
 

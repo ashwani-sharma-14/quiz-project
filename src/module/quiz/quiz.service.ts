@@ -12,14 +12,6 @@ interface QuizConfig {
   mode: string;
 }
 
-interface AnswerSubmission {
-  userQuizId: string;
-  timeTaken: number;
-  answers: {
-    questionId: string;
-    selectedAnswer: string;
-  }[];
-}
 const generateQuiz = async (config: QuizConfig) => {
   const {
     userId,
@@ -97,32 +89,7 @@ const generateQuiz = async (config: QuizConfig) => {
 
   selected = selected.sort(() => 0.5 - Math.random());
 
-  const userQuiz = await prisma.userQuiz.create({
-    data: {
-      userId,
-      category: categoryRecord.name,
-      topics: topicRecords.map((t) => t.name),
-      difficulty: isDifficultyArray
-        ? (difficulty as Difficulty[])[0] ?? "EASY"
-        : (difficulty as Difficulty),
-      totalQuestions,
-      timeLimit,
-      mode,
-      score: 0,
-    },
-  });
-
-  const quizEntries = selected.map((q) => ({
-    questionId: q.id,
-    userQuizId: userQuiz.id,
-  }));
-
-  await prisma.quiz.createMany({
-    data: quizEntries,
-  });
-
   return {
-    userQuizId: userQuiz.id,
     questions: selected.map(
       ({ id, question, options, difficulty, topicId }) => ({
         id,
@@ -132,35 +99,62 @@ const generateQuiz = async (config: QuizConfig) => {
         topicId,
       })
     ),
-    userQuizData: {
-      userQuizId: userQuiz.id,
+    quizConfig: {
       category: categoryRecord.name,
       topics: topicRecords.map((t) => t.name),
-      difficulty: isDifficultyArray
-        ? (difficulty as Difficulty[])[0] ?? "EASY"
-        : (difficulty as Difficulty),
+      difficulty,
       totalQuestions,
       timeLimit,
-      correct: null,
-      incorrect: null,
-      accuracy: null,
-      timeTaken: null,
-      score: null,
+      mode,
     },
   };
 };
 
 const submitQuiz = async ({
-  userQuizId,
+  userId,
+  category,
+  topics,
+  difficulty,
+  totalQuestions,
+  timeLimit,
+  mode,
+  questions,
   answers,
   timeTaken,
-}: AnswerSubmission) => {
-  const userQuiz = await prisma.userQuiz.findUnique({
-    where: { id: userQuizId },
-    include: { quizQuestions: true },
+}: {
+  userId: string;
+  category: string;
+  topics: string[];
+  difficulty: Difficulty | Difficulty[];
+  totalQuestions: number;
+  timeLimit: number;
+  mode: string;
+  questions: { id: string }[];
+  answers: { questionId: string; selectedAnswer: string }[];
+  timeTaken: number;
+}) => {
+  const userQuiz = await prisma.userQuiz.create({
+    data: {
+      userId,
+      category,
+      topics,
+      difficulty: Array.isArray(difficulty)
+        ? difficulty[0] ?? "EASY"
+        : difficulty,
+      totalQuestions,
+      timeLimit,
+      mode,
+      score: 0,
+      timeTaken,
+    },
   });
 
-  if (!userQuiz) throw new Error("Quiz not found");
+  await prisma.quiz.createMany({
+    data: questions.map((q) => ({
+      questionId: q.id,
+      userQuizId: userQuiz.id,
+    })),
+  });
 
   let correctCount = 0;
   let wrongCount = 0;
@@ -172,18 +166,16 @@ const submitQuiz = async ({
 
     if (!question) continue;
 
-    
     await prisma.attemptedQuestion.create({
       data: {
-        userQuizId,
+        userQuizId: userQuiz.id,
         questionId: ans.questionId,
       },
     });
 
-    
     await prisma.userAnswer.create({
       data: {
-        userQuizId,
+        userQuizId: userQuiz.id,
         questionId: ans.questionId,
         selected: ans.selectedAnswer,
         correct: question.correctAns,
@@ -194,7 +186,7 @@ const submitQuiz = async ({
       correctCount++;
       await prisma.correctQuestion.create({
         data: {
-          userQuizId,
+          userQuizId: userQuiz.id,
           questionId: ans.questionId,
         },
       });
@@ -202,7 +194,7 @@ const submitQuiz = async ({
       wrongCount++;
       await prisma.wrongQuestion.create({
         data: {
-          userQuizId,
+          userQuizId: userQuiz.id,
           questionId: ans.questionId,
         },
       });
@@ -213,7 +205,7 @@ const submitQuiz = async ({
   const score = (correctCount / userQuiz.totalQuestions) * 100;
 
   await prisma.userQuiz.update({
-    where: { id: userQuizId },
+    where: { id: userQuiz.id },
     data: {
       score,
       timeTaken,
