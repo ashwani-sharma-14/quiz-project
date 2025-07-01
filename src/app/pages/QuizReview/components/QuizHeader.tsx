@@ -1,5 +1,3 @@
-import React from "react";
-
 interface Props {
   category: string;
   topics: string;
@@ -9,7 +7,7 @@ interface Props {
 const QuizHeader: React.FC<Props> = ({ category, topics, difficulty }) => {
   return (
     <div className="flex flex-wrap justify-between items-center bg-white p-4 rounded shadow-md">
-      <div className="text-sm">
+      <div className="text-sm space-y-1">
         <p>
           <strong>Category:</strong> {category}
         </p>

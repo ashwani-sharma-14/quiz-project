@@ -9,7 +9,7 @@ interface Props {
   onPrev: () => void;
   onNext: () => void;
   isLastQuestion: boolean;
-  onFinish?: () => void; // Added optional onFinish property
+  onFinish?: () => void;
 }
 
 const QuestionPanel: React.FC<Props> = ({
@@ -17,7 +17,7 @@ const QuestionPanel: React.FC<Props> = ({
   onPrev,
   onNext,
   isLastQuestion,
-  onFinish = () => {}, // Default to empty function if not provided
+  onFinish = () => {},
 }) => {
   const {
     id,
@@ -27,14 +27,15 @@ const QuestionPanel: React.FC<Props> = ({
     selectedAnswer,
   } = question;
 
-  const renderOption = (option: string, idx: number) => {
+  const renderOption = (option: string, index: number) => {
     let bgColor = "bg-gray-100 text-black";
+
     if (option === correctAnswer) bgColor = "bg-green-500 text-white";
     else if (selectedAnswer === option) bgColor = "bg-red-500 text-white";
 
     return (
       <label
-        key={idx}
+        key={index}
         className={`block p-3 rounded ${bgColor} border cursor-default`}
       >
         <input
@@ -55,14 +56,12 @@ const QuestionPanel: React.FC<Props> = ({
       <h2 className="text-lg font-semibold mb-4">
         Q{id}. {qText}
       </h2>
-
       <div className="space-y-3 mb-6">{options.map(renderOption)}</div>
-
       <div className="flex justify-between">
         <button
           onClick={onPrev}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50"
           disabled={id === 1}
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50"
         >
           Previous
         </button>

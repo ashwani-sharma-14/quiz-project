@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { FaHome, FaBolt, FaStore, FaUser, FaBrain } from "react-icons/fa";
+import { FaHome, FaBolt, FaStore, FaBrain } from "react-icons/fa";
 
 type SidebarProps = {
   closeSidebar: () => void;
@@ -11,7 +11,6 @@ const Sidebar = ({  closeSidebar }: SidebarProps) => {
     { to: "/quiz", label: "Quiz", icon: <FaBrain /> },
     { to: "/hiring", label: "Hirings", icon: <FaBolt /> },
     { to: "/developer", label: "Developers", icon: <FaStore /> },
-    { to: "/profile", label: "Profile", icon: <FaUser /> },
   ];
 
   return (

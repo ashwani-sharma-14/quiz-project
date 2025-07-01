@@ -7,10 +7,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { hiringData } from "./data/hiringData";
+import { useHiringStore } from "@/store/useHiringStore";
+// import type { Job } from "@/store/useHiringStore";
 
 const Hiring = () => {
+  const { hiringData, fetchHiringData } = useHiringStore();
+
+  useEffect(() => {
+    fetchHiringData();
+  }, [fetchHiringData]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white px-6 py-10">
       <h1 className="text-4xl font-extrabold text-center text-blue-800 mb-4">
@@ -31,7 +39,7 @@ const Hiring = () => {
                 {job.jobTitle}
               </CardTitle>
               <CardDescription className="text-sm text-gray-500">
-                {job.company}
+                {job.companyName}
               </CardDescription>
             </CardHeader>
 
@@ -39,7 +47,7 @@ const Hiring = () => {
               <div className="flex items-start gap-2">
                 <span className="text-lg">💰</span>
                 <p>
-                  <span className="font-medium">Salary:</span> {job.salary}
+                  <span className="font-medium">Salary:</span> {job.package}
                 </p>
               </div>
               <div className="flex items-start gap-2">
@@ -48,15 +56,8 @@ const Hiring = () => {
                   <span className="font-medium">Location:</span> {job.location}
                 </p>
               </div>
-              <div className="flex items-start gap-2">
-                <span className="text-lg">👥</span>
-                <p>
-                  <span className="font-medium">Openings:</span> {job.openings}
-                </p>
-              </div>
-              <p className="text-xs text-gray-500 mt-2 italic">
-                Posted by: {job.postedBy}
-              </p>
+            
+             
             </CardContent>
 
             <CardFooter>
@@ -74,3 +75,4 @@ const Hiring = () => {
 };
 
 export default Hiring;
+

@@ -1,6 +1,7 @@
 interface Question {
   id: number;
 }
+
 interface Props {
   questions: Question[];
   currentIndex: number;
@@ -24,10 +25,13 @@ const SidePanel = ({
       <div className="grid grid-cols-6 gap-2">
         {questions.map((_, i) => {
           const { isCorrect } = questionResults[i];
-          let colorClass = "bg-gray-200 text-black border border-gray-300";
-          if (isCorrect) colorClass = "bg-green-500 text-white";
-          else colorClass = "bg-red-500 text-white";
-          if (i === currentIndex) colorClass += " ring-2 ring-yellow-400";
+          let colorClass = isCorrect
+            ? "bg-green-500 text-white"
+            : "bg-red-500 text-white";
+
+          if (i === currentIndex) {
+            colorClass += " ring-2 ring-yellow-400";
+          }
 
           return (
             <button

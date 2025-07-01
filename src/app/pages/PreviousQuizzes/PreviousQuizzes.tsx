@@ -16,7 +16,9 @@ const PreviousQuizzes = () => {
     if (!quizData) {
       getQuizList();
     }
+   
   }, [quizData, getQuizList]);
+  console.log(quizData);
 
   if (!quizData || !quizData) {
     return <div className="text-center text-gray-600 mt-10">Loading...</div>;

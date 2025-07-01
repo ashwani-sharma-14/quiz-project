@@ -22,42 +22,70 @@ interface Quiz {
     
 }
 interface fetchQuiz {
+  id: string;
+  userId: string;
+  category: string;
+  topics: string[];
+  difficulty: string;
+  totalQuestions: number;
+  mode: "examMode";
+  timeLimit: number;
+  createdAt: string;
+  questions: {
     id: string;
-    userId: string;
-    category: string;
-    topics: string[];
-    difficulty: "EASY" | "MEDIUM" | "HARD";
-    totalQuestions: number;
-    timeLimit: number;
-    score: number | null;
-    correct: object | null;
-    wrong: object | null;
-    timeTaken: number | null;
-    createdAt: Date;
-    updatedAt: Date;
-  
-    quizQuestions: {
+    questionId: string;
+    userQuizId: string;
+    questions: {
       id: string;
-      userQuizId: string;
-      questionId: number;
-      questions: {
-        id: number;
-        question: string;
-        options: string[];
+      question: string;
+      options: {
+        a: string;
+        b: string;
+        c: string;
+        d: string;
       };
-    }[];
-  
-    correctQuestions: {
-      questionId: number;
-    }[];
-  
-    wrongQuestions: {
-      questionId: number;
-    }[];
-  
-    attempted: {
-      questionId: number;
-    }[];
+      correctAns: string;
+      difficulty: string;
+      topicId: string;
+    };
+  }[];
+  quizQuestions: {
+    id: string;
+    questionId: string;
+    userQuizId: string;
+    questions: {
+      id: string;
+      question: string;
+      options: {
+        a: string;
+        b: string;
+        c: string;
+        d: string;
+      };
+      correctAns: string;
+      difficulty: string;
+      topicId: string;
+    };
+  }[];
+  score: number;
+  timeTaken: number;
+  attempted: {
+    questionId: string;
+  }[];
+  attemptedQuestions: string[];
+  correct: {
+    questionId: string;
+  }[];
+  correctQuestions: string[];
+  userAnswers: {
+    questionId: string;
+    selected: string;
+    correct: string;
+  }[];
+  wrong: {
+    questionId: string;
+  }[];
+  wrongQuestions: string[];
 };
 
 interface CategoryAndTopics{
@@ -197,6 +225,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
     set({ isCheckingQuiz: true, error: null });
     try {
       const response = await axiosInstance.get(`/quiz/${quizId}`);
+      console.log(response.data.quiz);
     
       set({
         fetchQuizState: response.data.quiz,
@@ -230,6 +259,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
     set({ isCheckingQuiz: true, error: null });
     try {
       const response = await axiosInstance.get(`/quiz/userQuiz`);
+      console.log(response.data);
       set({
         quizList: response.data.quizzes,
         isCheckingQuiz: false,
