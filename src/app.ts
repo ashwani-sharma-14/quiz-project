@@ -12,8 +12,8 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
       "https://placement-quiz-practice-portal.netlify.app",
+      "https://placement-quiz-practice-admin.netlify.app",
     ],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
