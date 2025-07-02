@@ -33,15 +33,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const isPublic = PUBLIC_ROUTES.includes(location.pathname);
     const isAuthenticated = isLoggedIn || !!accessToken;
 
-    // DEBUG: Add console logs to see what's happening
-    // console.log("🔍 Auth Debug:", {
-    //   isLoggedIn,
-    //   accessToken: accessToken ? "exists" : "null",
-    //   currentPath: location.pathname,
-    //   isPublic,
-    //   isAuthenticated,
-    //   allCookies: document.cookie
-    // });
 
     // If authenticated and trying to access public routes (login/signup), redirect to home
     if (isAuthenticated && isPublic) {

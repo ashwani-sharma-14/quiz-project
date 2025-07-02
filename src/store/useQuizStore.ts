@@ -2,24 +2,22 @@ import { create } from "zustand";
 import axiosInstance from "../utils/clientApiInstace";
 
 interface Quiz {
-
-        questions: {
-            id: string;
-            question: string;
-            options: string[];
-            correctAnswer: string;
-        }[];
-        userQuizData: {
-            category: string;
-            difficulty: string;
-            mode: "examMode";
-            timeLimit: number;
-            topics: string[];
-            totalQuestions: number;
-            userId: string;
-        };
-        userQuizId: string;
-    
+  questions: {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  }[];
+  quizConfig: {
+    category: string;
+    difficulty: string;
+    mode: "examMode";
+    timeLimit: number;
+    topics: string[];
+    totalQuestions: number;
+    userId: string;
+  };
+  userQuizId: string;
 }
 interface fetchQuiz {
   id: string;
@@ -31,6 +29,8 @@ interface fetchQuiz {
   mode: "examMode";
   timeLimit: number;
   createdAt: string;
+  correctCount: number;
+  wrongCount: number;
   questions: {
     id: string;
     questionId: string;
@@ -100,6 +100,7 @@ interface QuizStore {
   fetchQuizState: fetchQuiz | null;
   quizList: fetchQuiz[] | null;
   categoryAndTopics: CategoryAndTopics | null;
+  userQuizId: string | null;
   isCheckingQuiz: boolean;
   isCreatingQuiz: boolean;
   isUpdatingQuiz: boolean;
@@ -124,7 +125,18 @@ interface CreateQuizData {
 }
 
 interface AnswerSubmission {
-  userQuizId: string;
+  category: string;
+  topics: string[];
+  difficulty: string;
+  totalQuestions: number;
+  timeLimit: number;
+  mode: string;
+  questions: {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  }[];
   timeTaken: number;
   answers: {
     questionId: string;
@@ -138,6 +150,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
   fetchQuizState: null,
   categoryAndTopics: null,
   quizList: null,
+  userQuizId: null,
   isCheckingQuiz: true,
   isCreatingQuiz: false,
   isUpdatingQuiz: false,
@@ -159,6 +172,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
       }).toString();
 
       const response = await axiosInstance.get(`/quiz/newquiz?${queryParams}`);
+
       set({
         createQuizState: response.data.data,
         isCreatingQuiz: false,
@@ -188,16 +202,26 @@ export const useQuizStore = create<QuizStore>((set) => ({
   },
 
   updateQuiz: async (quizData: AnswerSubmission) => {
-    set({ isQuizCompleted: true, error: null });
+    set({ isUpdatingQuiz: true, error: null });
     try {
       const response = await axiosInstance.post(`/quiz/submit`, quizData);
+
       if (response?.data?.message === "quiz submitted") {
+        const userQuizId = response.data.result.userQuizId;
+
         set({
-          createQuizState: null,
-          isQuizCompleted: false,
+          fetchQuizState: response.data.result,
+          isUpdatingQuiz: false,
+          isQuizCompleted: true,
         });
+
+        return userQuizId; 
+      } else {
+        throw new Error("Unexpected response");
       }
     } catch (error) {
+      set({ isUpdatingQuiz: false });
+
       let errorMessage = "Failed to update quiz";
       if (
         error &&
@@ -214,10 +238,9 @@ export const useQuizStore = create<QuizStore>((set) => ({
           (error.response as { data: { message?: string } }).data.message ||
           errorMessage;
       }
-      set({
-        isUpdatingQuiz: false,
-        error: errorMessage,
-      });
+
+      set({ error: errorMessage });
+      return null; // ❌ failed submission
     }
   },
 
@@ -225,8 +248,8 @@ export const useQuizStore = create<QuizStore>((set) => ({
     set({ isCheckingQuiz: true, error: null });
     try {
       const response = await axiosInstance.get(`/quiz/${quizId}`);
-      console.log(response.data.quiz);
-    
+  
+
       set({
         fetchQuizState: response.data.quiz,
         isCheckingQuiz: false,
@@ -259,7 +282,6 @@ export const useQuizStore = create<QuizStore>((set) => ({
     set({ isCheckingQuiz: true, error: null });
     try {
       const response = await axiosInstance.get(`/quiz/userQuiz`);
-      console.log(response.data);
       set({
         quizList: response.data.quizzes,
         isCheckingQuiz: false,

@@ -14,17 +14,26 @@ import {
   deactivateSecurityHooks,
 } from "../../../utils/useQuizSecurity";
 
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
 const QuizPage = () => {
   const navigate = useNavigate();
   const QuizData = useQuizStore((state) => state.createQuizState);
   const updateQuiz = useQuizStore((state) => state.updateQuiz);
-  const isCreatingQuiz = useQuizStore((state) => state.isCreatingQuiz);
-
   const [showInstruction, setShowInstruction] = useState(true);
   const questions = QuizData?.questions || [];
   const { category, topics, difficulty, timeLimit } =
-    QuizData?.userQuizData || {};
-
+    QuizData?.quizConfig || {};
+  const [loading, setLoading] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [normalizedQuestions, setNormalizedQuestions] = useState(questions);
 
   useEffect(() => {
@@ -44,7 +53,6 @@ const QuizPage = () => {
   );
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
-
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [reEnterFullscreen, setReEnterFullscreen] = useState(false);
   const [security, setSecurity] = useState(false);
@@ -53,35 +61,40 @@ const QuizPage = () => {
   const [remainingTime, setRemainingTime] = useState(quizTimeInSeconds);
   const [instructionPopUpOpen, setInstructionPopUpOpen] = useState(false);
 
-  const handleFinalSubmit = () => {
+  const handleFinalSubmit = async () => {
     deactivateSecurityHooks();
     localStorage.removeItem("switchAttempts");
-    toast.success("Quiz submitted successfully.");
-    const quidId = QuizData?.userQuizId;
-    updateQuiz({
-      userQuizId: quidId ?? "",
+    setLoading(true);
+
+    const userQuizId = await updateQuiz({
+      category: QuizData?.quizConfig.category ?? "",
+      topics: QuizData?.quizConfig.topics ?? [],
+      difficulty: QuizData?.quizConfig.difficulty ?? "EASY",
+      totalQuestions: QuizData?.quizConfig.totalQuestions ?? 0,
+      timeLimit: QuizData?.quizConfig.timeLimit ?? 30,
+      mode: QuizData?.quizConfig.mode ?? "examMode",
+      questions: QuizData?.questions ?? [],
       timeTaken: (quizTimeInSeconds - remainingTime) / 60,
       answers: answers.map((answer, index) => ({
         questionId: String(questions[index].id),
         selectedAnswer: answer || "",
       })),
     });
-    if (!isCreatingQuiz) {
-      navigate(`/quiz/${quidId}/analysis`);
+
+    setLoading(false);
+
+    if (typeof userQuizId === "string") {
+      toast.success("Quiz submitted successfully.");
+      navigate(`/quiz/${userQuizId}/analysis`);
+    } else {
+      toast.error("Failed to submit quiz.");
     }
   };
 
-  const handleLeave = () => {
-    const confirmLeave = window.confirm(
-      "Are you sure you want to end the quiz and leave?"
-    );
-    if (confirmLeave) {
-      deactivateSecurityHooks();
-      toast.warning("Quiz was exited before submission.");
-      navigate("/");
-    } else if (!document.fullscreenElement) {
-      document.body.requestFullscreen();
-    }
+  const handleLeaveConfirmed = () => {
+    deactivateSecurityHooks();
+    toast.warning("Quiz was exited before submission.");
+    navigate("/");
   };
 
   useEffect(() => {
@@ -111,7 +124,6 @@ const QuizPage = () => {
       return () => clearInterval(timer);
     }
   }, [showInstruction, security]);
-  
 
   useEffect(() => {
     setSelectedOption(answers[currentIndex]);
@@ -149,7 +161,7 @@ const QuizPage = () => {
 
   const onClosePopUp = () => {
     setInstructionPopUpOpen(false);
-  }
+  };
 
   return (
     <div className="h-full bg-gradient-to-br from-blue-50 to-white p-4 overflow-hidden md:overflow-auto md:p-6 hide-scrollbar">
@@ -159,10 +171,8 @@ const QuizPage = () => {
           setSecurity={setSecurity}
         />
       ) : (
-          <div>
-            {instructionPopUpOpen && (
-              <InstructionPopup onClose={onClosePopUp} />
-            )}
+        <div>
+          {instructionPopUpOpen && <InstructionPopup onClose={onClosePopUp} />}
           {alertMessage && (
             <SecurityAlert
               message={alertMessage}
@@ -190,13 +200,40 @@ const QuizPage = () => {
             />
           )}
 
+          {/* Leave Quiz Button with Confirmation Dialog */}
           <div className="flex justify-end">
-            <button
-              onClick={handleLeave}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            >
-              Leave Quiz
-            </button>
+            <Dialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+              <DialogTrigger asChild>
+                <Button
+                 
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => setShowLeaveDialog(true)}
+                >
+                  Leave Quiz
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md border border-gray-200 bg-white shadow-2xl rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle>
+                    Are you sure you want to leave the quiz?
+                  </DialogTitle>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    className="bg-gray-600 hover:bg-gray-700 text-white rounded-2xl"
+                    onClick={() => setShowLeaveDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-red-600 hover:bg-red-700 text-white rounded-2xl"
+                    onClick={handleLeaveConfirmed}
+                  >
+                    Confirm Leave
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <QuizHeader
@@ -245,6 +282,7 @@ const QuizPage = () => {
 
           {showSummary && (
             <SubmissionStatus
+              loading={loading}
               answered={questionStatus.filter((s) => s === "answered").length}
               reviewed={
                 questionStatus.filter((s) => s === "savedAndMarkedForReview")

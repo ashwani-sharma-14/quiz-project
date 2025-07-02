@@ -67,7 +67,7 @@ export const useAuthStore = create(
       googlelogin: async (code: string, navigate: (path: string) => void) => {
         try {
           const result = await api.get("/user/google?code=" + code);
-          console.log(result);
+        
 
           if (result.data.message === "Outside domain") {
             toast.error("Please use your college email id");
