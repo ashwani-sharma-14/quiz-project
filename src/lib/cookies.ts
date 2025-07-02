@@ -7,17 +7,22 @@ export const setAuthCookie = (
   refreshToken?: string,
   user?: any
 ) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("accessToken", accessToken, {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    secure: isProduction, 
+    sameSite: "none", 
     maxAge: 15 * 60 * 1000,
   });
+
 
   if (refreshToken) {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: isProduction,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
   }
 
