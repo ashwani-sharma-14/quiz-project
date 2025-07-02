@@ -104,7 +104,7 @@ const Navbar = ({ isOpen, toggleSidebar }: NavbarProps) => {
         </div>
 
         {showMenu && (
-          <div className="absolute right-0 mt-2 w-64 bg-gray-200 border border-gray-300 rounded-2xl shadow-lg p-4 z-50">
+          <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-300 rounded-2xl shadow-lg p-4 z-50">
             <p className="text-sm">
               <strong>Name:</strong> {user.name}
             </p>

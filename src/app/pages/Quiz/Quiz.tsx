@@ -114,7 +114,7 @@ const Quiz = () => {
 
       case 3:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 pb-4 " style={{ paddingLeft: "1rem" }}>
             <h2 className="text-2xl font-semibold text-gray-800">
               Set Quiz Preferences
             </h2>

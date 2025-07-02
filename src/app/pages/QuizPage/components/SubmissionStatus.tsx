@@ -41,7 +41,14 @@ const SubmissionStatus: React.FC<SubmissionStatusProps> = ({
           onClick={onConfirmSubmit}
           className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 flex items-center justify-center gap-2"
         >
-          {loading ? <Loader className="animate-spin w-4 h-4" /> : "Submit & View Analysis"}
+          {loading ? (
+            <>
+              <Loader className="animate-spin w-4 h-4" />
+              Submitting...
+            </>
+          ) : (
+            "Submit & View Analysis"
+          )}
         </button>
       </div>
     </div>

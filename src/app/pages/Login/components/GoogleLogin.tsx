@@ -1,7 +1,7 @@
 import React from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/logo.jpg";
+import google from "@/assets/google.png";
 import { Button } from "@/components/ui/button";
 
 interface GoogleUser {
@@ -47,7 +47,7 @@ const GoogleLogin: React.FC = () => {
       onClick={googleLogin}
       className="flex items-center justify-center bg-white text-black border border-gray-300 rounded-[8px] text-sm px-4 py-2 hover:bg-gray-100"
     >
-      <img src={logo} alt="google-icon" className="w-5 h-5 mr-2" />
+      <img src={google} alt="google-icon" className="w-5 h-5 mr-2" />
       Login with Google
     </Button>
   );

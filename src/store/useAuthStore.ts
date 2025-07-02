@@ -12,6 +12,7 @@ interface SignupData {
   name: string;
   email: string;
   password: string;
+  confirmPassword?: string;
   enrollment: string;
   profile: string;
   branch: string;
@@ -114,9 +115,10 @@ export const useAuthStore = create(
       },
 
       signup: async (data: SignupData) => {
+        delete data.confirmPassword;
         try {
           const response = await api.post("/user/signup", data);
-
+          console.log(response);
           if (!response.data.success) {
             toast.error("Failed to SignUp");
             return false;

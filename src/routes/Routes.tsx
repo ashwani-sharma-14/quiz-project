@@ -1,4 +1,4 @@
-// routes.tsx
+import { lazy, Suspense } from "react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -10,6 +10,10 @@ import {
 import BaseLayout from "@/app/layouts/BaseLayout";
 import AuthProvider from "@/app/providers/AuthProvider";
 
+// Lazy-loaded components
+const Login = lazy(() => import("@/app/pages/Login/Login"));
+const Signup = lazy(() => import("@/app/pages/SignUp/Signup"));
+
 import Home from "@/app/pages/Home/Home";
 import Quiz from "@/app/pages/Quiz/Quiz";
 import HiringUpdates from "@/app/pages/Hiring/Hiring";
@@ -19,8 +23,7 @@ import QuizPage from "@/app/pages/QuizPage/QuizPage";
 import QuizAnalysis from "@/app/pages/QuizAnalysis/QuizAnalysis";
 import QuizReview from "@/app/pages/QuizReview/QuizReview";
 import PreviousQuizzes from "@/app/pages/PreviousQuizzes/PreviousQuizzes";
-import Login from "@/app/pages/Login/Login";
-import Signup from "@/app/pages/SignUp/Signup";
+import AuthSkeleton from "@/components/skeleton/AuthSkeletion";
 
 export default function Routes() {
   const router = createBrowserRouter(
@@ -34,8 +37,22 @@ export default function Routes() {
         }
       >
         {/* Public routes - no BaseLayout */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/sign-up" element={<Signup />} />
+        <Route
+          path="/login"
+          element={
+            <Suspense fallback={<AuthSkeleton />}>
+              <Login />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={
+            <Suspense fallback={<AuthSkeleton />}>
+              <Signup />
+            </Suspense>
+          }
+        />
         <Route path="quiz/quizScreen" element={<QuizPage />} />
 
         {/* Protected routes - with BaseLayout */}

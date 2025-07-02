@@ -16,7 +16,7 @@ const Home = () => {
     fetchData();
   }, [getAllQuizzes]);
 
-  const totalQuizzes = quizList?.length;
+  const totalQuizzes = quizList?.length||0;
   const totalQuestions = quizList?.reduce(
     (sum, q) => sum + (q.totalQuestions || 0),
     0
