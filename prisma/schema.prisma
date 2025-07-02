@@ -98,8 +98,8 @@ model UserQuiz {
   timeLimit      Int
   mode           String
   // attempted      Int
-  // correct        Int
-  // wrong          Int
+   correctCount        Int?
+   wrongCount          Int?
   score          Float
   timeTaken      Int?
   createdAt      DateTime   @default(now())

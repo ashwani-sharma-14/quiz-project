@@ -23,6 +23,7 @@ const generateQuiz = async (config: QuizConfig) => {
     mode,
   } = config;
 
+
   const categoryRecord = await prisma.category.findUnique({
     where: { id: categoryId },
   });
@@ -89,6 +90,8 @@ const generateQuiz = async (config: QuizConfig) => {
 
   selected = selected.sort(() => 0.5 - Math.random());
 
+
+
   return {
     questions: selected.map(
       ({ id, question, options, difficulty, topicId }) => ({
@@ -132,7 +135,7 @@ const submitQuiz = async ({
   questions: { id: string }[];
   answers: { questionId: string; selectedAnswer: string }[];
   timeTaken: number;
-}) => {
+  }) => {
   const userQuiz = await prisma.userQuiz.create({
     data: {
       userId,
@@ -146,6 +149,8 @@ const submitQuiz = async ({
       mode,
       score: 0,
       timeTaken,
+      correctCount: 0,
+      wrongCount: 0,
     },
   });
 
@@ -209,10 +214,13 @@ const submitQuiz = async ({
     data: {
       score,
       timeTaken,
+      correctCount: correctCount,
+      wrongCount: wrongCount,
     },
   });
 
   return {
+    userQuizId: userQuiz.id,
     totalAttempted: total,
     correct: correctCount,
     wrong: wrongCount,
@@ -232,6 +240,9 @@ const getAllUserQuizzes = async (userId: string) => {
       totalQuestions: true,
       timeLimit: true,
       score: true,
+      timeTaken: true,
+      correctCount: true,
+      wrongCount: true,
       createdAt: true,
     },
     orderBy: { createdAt: "desc" },

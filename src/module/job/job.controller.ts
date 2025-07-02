@@ -12,7 +12,6 @@ const createJob = asyncWrap(async (req: Request, res: Response) => {
 const updateJob = asyncWrap(async (req: Request, res: Response) => {
   const data = req.body;
   
-  console.log(req.body);
   const id = req.params.id as string;
   const job = await jobService.updateJob(id, data);
   return res.json({ success: true, message: "job updated", job });

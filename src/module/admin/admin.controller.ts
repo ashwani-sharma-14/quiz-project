@@ -78,7 +78,7 @@ const uploadExcel = asyncWrap(async (req: Request, res: Response) => {
   }
 
   const parsedData = parseExcelData(data);
-  console.log(parsedData);
+
   const savedData = await adminService.saveQuestionsToDB(parsedData);
   fs.unlinkSync(filePath);
   return res.json({
