@@ -8,11 +8,11 @@ import {
 import BaseLayout from "@/app/layout/BaseLayout";
 import { lazy, Suspense } from "react";
 import AuthProvider from "@/app/providers/AuthProvider";
+import QuestionsTable from "@/app/pages/questions/QuestionsTable";
+import JobTable from "@/app/pages/jobs/JobsTable";
+import Dashboard from "@/app/pages/dashboard/Dashboard";
+import StudentsTable from "@/app/pages/students/StudentsTable";
 const LoginPage = lazy(() => import("@/app/pages/auth/Login"));
-const QuestionPage = lazy(() => import("@/app/pages/questions/QuestionsTable"));
-const JobsPage = lazy(() => import("@/app/pages/jobs/JobsTable"));
-const Dashboard = lazy(() => import("@/app/pages/dashboard/Dashboard"));
-const Student = lazy(() => import("@/app/pages/students/StudentsTable"));
 const Routes = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -61,7 +61,7 @@ const Routes = () => {
               path="questions"
               element={
                 <Suspense>
-                  <QuestionPage />
+                  <QuestionsTable />
                 </Suspense>
               }
             />
@@ -69,15 +69,15 @@ const Routes = () => {
               path="jobs"
               element={
                 <Suspense>
-                  <JobsPage />
+                  <JobTable />
                 </Suspense>
               }
             />
             <Route
-              path="students"
+              path="Students"
               element={
                 <Suspense>
-                  <Student />
+                  <StudentsTable />
                 </Suspense>
               }
             />

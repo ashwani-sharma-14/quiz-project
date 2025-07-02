@@ -53,7 +53,9 @@ const QuestionsTable = () => {
   const fetchQuestions = useQuestionStore((s) => s.fetchQuestions);
   const updateQuestion = useQuestionStore((s) => s.updateQuestion);
   const deleteQuestion = useQuestionStore((s) => s.deleteQuestion);
+  const uploadToast = useQuestionStore((s) => s.uploadToast);
   const data = useQuestionStore((s) => s.questions);
+  const loading = useQuestionStore((s) => s.loading);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
@@ -62,19 +64,16 @@ const QuestionsTable = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [filter, setFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [delayPassed, setDelayPassed] = useState(false);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDelayPassed(true);
-    }, 3000); // Delay for toast
+    }, 3000);
 
-    fetchQuestions()
-      .finally(() => {
-        setLoading(false);
-        clearTimeout(timeoutId);
-      });
+    fetchQuestions().finally(() => {
+      clearTimeout(timeoutId);
+    });
   }, [fetchQuestions]);
 
   useEffect(() => {
@@ -136,7 +135,6 @@ const QuestionsTable = () => {
 
   return (
     <div className="space-y-8 p-6">
-      {/* Header: Search + New Question */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Input
           placeholder="Search questions..."
@@ -145,7 +143,13 @@ const QuestionsTable = () => {
           className="w-full sm:w-1/2 rounded-xl"
         />
         <Button
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => {
+            if (uploadToast.status === "uploading") {
+              toast.warning("Some questions are already uploading. Please wait...");
+            } else {
+              setIsDialogOpen(true);
+            }
+          }}
           className="w-full sm:w-auto rounded-xl shadow"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -153,14 +157,12 @@ const QuestionsTable = () => {
         </Button>
       </div>
 
-      {/* Loading Spinner */}
-      {loading ? (
+      {loading && uploadToast.status !== "uploading" ? (
         <div className="flex items-center justify-center min-h-[60vh] w-full">
           <Loader2 className="animate-spin h-8 w-8 text-muted-foreground" />
         </div>
       ) : (
         <>
-          {/* Questions Table */}
           <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
             <Table>
               <TableCaption className="text-sm text-muted-foreground p-2">
@@ -182,10 +184,7 @@ const QuestionsTable = () => {
               <TableBody>
                 {paginatedQuestions.length > 0 ? (
                   paginatedQuestions.map((q, index) => (
-                    <TableRow
-                      key={q.id}
-                      className="hover:bg-gray-50 transition-colors duration-150"
-                    >
+                    <TableRow key={q.id} className="hover:bg-gray-50 transition-colors duration-150">
                       <TableCell className="text-center font-medium">
                         {(currentPage - 1) * ROWS_PER_PAGE + index + 1}
                       </TableCell>
@@ -251,7 +250,6 @@ const QuestionsTable = () => {
             </Table>
           </div>
 
-          {/* Pagination */}
           <div className="flex justify-center">
             <CustomPagination
               currentPage={currentPage}

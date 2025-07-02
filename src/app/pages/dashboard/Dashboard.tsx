@@ -1,17 +1,32 @@
 import { useEffect } from "react";
 import type { ReactElement } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, HelpCircle, Users } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Briefcase, HelpCircle, Users, RefreshCw } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
-  const { jobs, questions, students, fetchDashboardData, loading, error } =
-    useDashboardStore();
+  const {
+    jobs,
+    questions,
+    students,
+    fetchDashboardData,
+    loading,
+    refreshing,
+    error,
+  } = useDashboardStore();
 
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
+
+  const isInitialLoading = loading;
 
   const renderCard = (
     title: string,
@@ -19,7 +34,12 @@ const Dashboard = () => {
     icon: ReactElement,
     subtitle: string
   ) => (
-    <Card>
+    <Card
+      className={cn(
+        "transition-opacity duration-300",
+        refreshing && !isInitialLoading && "opacity-50"
+      )}
+    >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon}
@@ -33,16 +53,33 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <Button
+          variant="outline"
+          onClick={() => fetchDashboardData(true)}
+          disabled={refreshing}
+        >
+          <RefreshCw
+            className={cn(
+              "mr-2 h-4 w-4",
+              refreshing ? "animate-spin" : "hidden"
+            )}
+          />
+          {refreshing ? "Refreshing..." : "Refresh"}
+        </Button>
+      </div>
+
       {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-          <>
-            <Skeleton className="h-[100px] w-full rounded-xl" />
-            <Skeleton className="h-[100px] w-full rounded-xl" />
-            <Skeleton className="h-[100px] w-full rounded-xl" />
-          </>
+        {isInitialLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-[120px] w-full rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse border border-gray-300 dark:border-gray-700 shadow-sm"
+            />
+          ))
         ) : (
           <>
             {renderCard(
