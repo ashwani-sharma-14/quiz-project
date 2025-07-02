@@ -7,5 +7,5 @@ const clientSecret = env.authClientSecret as string
 export const oauth2Client = new google.auth.OAuth2(
   clinetId,
   clientSecret,
-  "postmessage"
+  "https://placementprojectbackend.onrender.com/api/auth/google/callback"
 );
