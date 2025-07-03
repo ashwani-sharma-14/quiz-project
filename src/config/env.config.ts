@@ -11,5 +11,10 @@ export const env = {
   refreshTokenSecret: process.env.REFRESh_SECRET,
   timeOut: process.env.JSON_TOKEN_TIMEOUT,
   nodeEnv: process.env.NODE_ENV,
-
+  mailerEmail: process.env.MAILER_EMAIL,
+  mailerPassword: process.env.MAILER_PASSWORD,
+  mailerService: process.env.MAILER_SERVICE,
+  from: process.env.FROM,
+  otpSecret: process.env.OTP_SECRET,
+  otpTimeOut: process.env.OTP_TIMEOUT,
 };

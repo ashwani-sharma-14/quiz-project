@@ -98,8 +98,8 @@ model UserQuiz {
   timeLimit      Int
   mode           String
   // attempted      Int
-   correctCount        Int?
-   wrongCount          Int?
+  correctCount   Int?
+  wrongCount     Int?
   score          Float
   timeTaken      Int?
   createdAt      DateTime   @default(now())
@@ -144,4 +144,18 @@ model Jobs {
   package        String?
   logo           String
   location       String?
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  code      Int      @unique
+  email     String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model Branch {
+  id     String @id @default(uuid())
+  key    String
+  branch String
 }

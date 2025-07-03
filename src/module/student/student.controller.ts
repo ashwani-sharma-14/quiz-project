@@ -3,10 +3,15 @@ import { Request, Response } from "express";
 import { oauth2Client } from "@/config/google.config";
 import bcrypt from "bcrypt";
 import axios from "axios";
-import { generateTokens, verifyRefreshToken } from "@/lib/auth";
-import { setAuthCookie } from "@/lib/cookies";
+import {
+  generateTokens,
+  verifyRefreshToken,
+  generateOtpToken,
+} from "@/lib/auth";
+import { setAuthCookie, setOtpCookie, clearOtpCookie } from "@/lib/cookies";
 import { asyncWrap } from "@/utils/asyncWrap";
-
+import { sendWelcomeEmail } from "@/lib/emailService";
+import { sendResetPasswordEmail } from "@/lib/emailService";
 const signUpUser = async (req: Request, res: Response) => {
   const data = req.body;
   const { password } = data;
@@ -18,6 +23,8 @@ const signUpUser = async (req: Request, res: Response) => {
     userId: String(user.id),
     email: user.email,
   });
+
+  await sendWelcomeEmail(user.email, user.name);
 
   const { password: _password, ...restUser } = user;
 
@@ -84,15 +91,15 @@ const googleLogin = async (req: Request, res: Response) => {
 
   const user = await studentService.findUserByEmail(data.email);
 
- if (!user) {
+  if (!user) {
     if (data.email.endsWith("@gmail.com")) {
       return res
-      .json({
-        success: false,
-        message: "Outside domain",
-        user: data,
-      })
-      .status(401);
+        .json({
+          success: false,
+          message: "Outside domain",
+          user: data,
+        })
+        .status(401);
     }
     return res
       .json({
@@ -139,10 +146,77 @@ const refreshToken = asyncWrap(async (req: Request, res: Response) => {
   );
 });
 
+const sendOtp = asyncWrap(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const otp = await studentService.sendOtp(email);
+  if (!otp) {
+    return res.json({ success: false, message: "user not found" }).status(401);
+  }
+
+  const emailResponse = await sendResetPasswordEmail(email, otp);
+  if (!emailResponse)
+    return res.json({ success: false, message: "otp not sent" }).status(401);
+
+  return res
+    .json({ success: true, message: "otp sent successfully" })
+    .status(200);
+});
+
+const verifyOtp = asyncWrap(async (req: Request, res: Response) => {
+  const { email, code } = req.body;
+
+  const isVerified = await studentService.verifyOtp(email, code);
+
+  if (!isVerified) {
+    return res
+      .status(401)
+      .json({ success: false, message: "OTP not verified" });
+  }
+  const otpToken = generateOtpToken({ email });
+  setOtpCookie(res, otpToken);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "OTP verified successfully" });
+});
+
+const resetPassword = asyncWrap(async (req: Request, res: Response) => {
+  const email = req.otpUser?.email;
+  if (!email)
+    return res
+      .json({ success: false, message: "You are not authorized" })
+      .status(401);
+  const data = req.body;
+  const { password } = data;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  data.password = hashedPassword;
+  const isPasswordReset = await studentService.resetPassword(
+    email,
+    data.password
+  );
+
+  if (!isPasswordReset) {
+    clearOtpCookie(res);
+    return res
+      .json({ success: false, message: "password not reset" })
+      .status(401);
+  }
+  clearOtpCookie(res);
+  return res
+    .json({
+      successs: true,
+      message: "password reset successfully Now you can Login",
+    })
+    .status(200);
+});
+
 export const userController = {
   signUpUser,
   login,
   googleLogin,
   logout,
   refreshToken,
+  sendOtp,
+  verifyOtp,
+  resetPassword,
 };
