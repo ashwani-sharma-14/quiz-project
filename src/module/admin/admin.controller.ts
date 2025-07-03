@@ -1,14 +1,13 @@
 import { asyncWrap } from "@/utils/asyncWrap";
 import bcrypt from "bcrypt";
 import { adminService } from "./admin.service";
-import fs from "fs";
-import path from "path";
+import { uploadToCloudinary } from "@/utils/cloudinaryUpload";
 import { readExcelFile } from "@/scripts/readExcelFile";
 import { Response, Request } from "express";
 import { parseExcelData } from "@/scripts/parsedFile";
 import { verifyRefreshToken, generateTokens } from "@/lib/auth";
 import { setAuthCookie } from "@/lib/cookies";
-
+import { checkAdmin } from "@/lib/checkAdmin";
 const registerAdmin = asyncWrap(async (req: Request, res: Response) => {
   const data = req.body;
   const password = data.password;
@@ -44,7 +43,7 @@ const login = asyncWrap(async (req: Request, res: Response) => {
 
 const uploadExcel = asyncWrap(async (req: Request, res: Response) => {
   const adminEmail = req.user?.email;
-  if (!adminEmail) {
+  if (!adminEmail || !(await checkAdmin(adminEmail))) {
     return res.status(401).json({ message: "Use are not authorized" });
   }
 
@@ -61,36 +60,39 @@ const uploadExcel = asyncWrap(async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Invalid file format" });
   }
 
-  const uploadDir = path.join(__dirname, "../../../uploads");
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-  const filePath = path.join(uploadDir, file.originalname);
+  // Upload Excel to Cloudinary as raw file
+  const result: any = await uploadToCloudinary(
+    file.buffer,
+    "excel_uploads",
+    file.originalname,
+    "raw"
+  );
 
-  fs.writeFileSync(filePath, file.buffer);
-  const data = await readExcelFile(filePath);
+  // Parse Excel from buffer (no need to save to disk)
+  const data = await readExcelFile(file.buffer);
 
   if (!data) {
     return res.json({
       message: "No data found",
       filename: file.originalname,
+      cloudinaryUrl: result.secure_url,
     });
   }
 
   const parsedData = parseExcelData(data);
-
   const savedData = await adminService.saveQuestionsToDB(parsedData);
-  fs.unlinkSync(filePath);
+
   return res.json({
     message: "File uploaded successfully",
     filename: file.originalname,
+    cloudinaryUrl: result.secure_url,
     savedData,
   });
 });
 
 const getAllUsers = asyncWrap(async (req: Request, res: Response) => {
-  const AdminEmail = req.user?.email;
-  if (!AdminEmail) {
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !(await checkAdmin(adminEmail))) {
     return res.status(401).json({ message: "Use are not authorized" });
   }
 
@@ -102,12 +104,20 @@ const getAllUsers = asyncWrap(async (req: Request, res: Response) => {
   });
 });
 
-const getAllQuestions = asyncWrap(async (_req: Request, res: Response) => {
+const getAllQuestions = asyncWrap(async (req: Request, res: Response) => {
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !(await checkAdmin(adminEmail))) {
+    return res.status(401).json({ message: "Use are not authorized" });
+  }
   const questions = await adminService.getAllQuestions();
   return res.json({ message: "Questions fetched successfully", questions });
 });
 
 const updateQuestion = asyncWrap(async (req: Request, res: Response) => {
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !(await checkAdmin(adminEmail))) {
+    return res.status(401).json({ message: "Use are not authorized" });
+  }
   const id = req.params.id as string;
   const data = req.body;
   const question = await adminService.updateQuestion(id, data);
@@ -120,6 +130,10 @@ const updateQuestion = asyncWrap(async (req: Request, res: Response) => {
 });
 
 const deleteQuestions = asyncWrap(async (req: Request, res: Response) => {
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !(await checkAdmin(adminEmail))) {
+    return res.status(401).json({ message: "Use are not authorized" });
+  }
   const id = req.params.id as string;
   const question = await adminService.deleteQuestion(id);
   if (!question) {
@@ -135,6 +149,10 @@ const deleteQuestions = asyncWrap(async (req: Request, res: Response) => {
 });
 
 const getAllQuestionsById = asyncWrap(async (req: Request, res: Response) => {
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !(await checkAdmin(adminEmail))) {
+    return res.status(401).json({ message: "Use are not authorized" });
+  }
   const id = req.params.id as string;
   const questions = await adminService.getAllQuestionsById(id);
   return res.json({ message: "Questions fetched successfully", questions });

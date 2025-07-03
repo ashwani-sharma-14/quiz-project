@@ -1,16 +1,15 @@
 import { Response, Request } from "express";
 import { branchService } from "./branch.service";
 import { asyncWrap } from "@/utils/asyncWrap";
+import { checkAdmin } from "@/lib/checkAdmin";
 
 const createBranch = asyncWrap(async (req: Request, res: Response) => {
-  const email = req.user?.email;
-  if (!email) {
-    return res
-      .status(401)
-      .json({ success: false, message: "You are not authorized" });
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !await checkAdmin(adminEmail)) {
+    return res.status(401).json({ message: "Use are not authorized" });
   }
   const data = req.body;
-  const branch = await branchService.createBranch(data, email);
+  const branch = await branchService.createBranch(data);
   if (!branch) {
     return res
       .status(401)
@@ -31,14 +30,13 @@ const getAllBranches = asyncWrap(async (_req: Request, res: Response) => {
 });
 
 const updateBranch = asyncWrap(async (req: Request, res: Response) => {
-  const email = req.user?.email;
-  if (!email)
-    return res
-      .json({ success: false, message: "You are not authorized" })
-      .status(401);
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !await checkAdmin(adminEmail)) {
+    return res.status(401).json({ message: "Use are not authorized" });
+  }
   const id = req.params.id as string;
   const data = req.body;
-  const branch = await branchService.updateBranch(id, data, email);
+  const branch = await branchService.updateBranch(id, data);
   if (!branch) {
     return res
       .status(401)
@@ -50,14 +48,12 @@ const updateBranch = asyncWrap(async (req: Request, res: Response) => {
 });
 
 const deleteBranch = asyncWrap(async (req: Request, res: Response) => {
-  const email = req.user?.email;
-  if (!email) {
-    return res
-      .status(401)
-      .json({ success: false, message: "You are not authorized" });
+  const adminEmail = req.user?.email;
+  if (!adminEmail || !await checkAdmin(adminEmail)) {
+    return res.status(401).json({ message: "Use are not authorized" });
   }
   const id = req.params.id as string;
-  const branch = await branchService.deleteBranch(id, email);
+  const branch = await branchService.deleteBranch(id);
   if (!branch) {
     return res
       .status(401)

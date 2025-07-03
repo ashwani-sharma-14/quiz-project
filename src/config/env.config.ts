@@ -17,4 +17,9 @@ export const env = {
   from: process.env.FROM,
   otpSecret: process.env.OTP_SECRET,
   otpTimeOut: process.env.OTP_TIMEOUT,
+  cloudinary: {
+    cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+  },
 };
