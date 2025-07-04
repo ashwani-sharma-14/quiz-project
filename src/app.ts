@@ -14,6 +14,7 @@ app.use(
     origin: [
       "https://placement-quiz-practice-portal.netlify.app",
       "https://placement-quiz-practice-admin.netlify.app",
+      "http://localhost:5173",
     ],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
