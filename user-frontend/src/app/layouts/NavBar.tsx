@@ -1,107 +1,125 @@
-import { useState } from "react";
-import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { useRef, useState } from "react";
+import { FaUserCircle, FaBars, FaTimes, FaSignOutAlt } from "react-icons/fa";
 import logo from "../../assets/logoWithName.png";
+import { useAuthStore } from "@/store/useAuthStore";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-const Navbar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+type NavbarProps = {
+  isOpen: boolean;
+  toggleSidebar: () => void;
+};
 
-  const toggleMenu = () => setMenuOpen((prev) => !prev);
+interface UseAuthStore {
+  logout: () => Promise<boolean>;
+}
+
+type User = {
+  admissionYear: number;
+  branch: string;
+  currentYear: number;
+  email: string;
+  enrollment: string;
+  id: string;
+  name: string;
+  profile: string;
+};
+
+const Navbar = ({ isOpen, toggleSidebar }: NavbarProps) => {
+  const logout = useAuthStore((state) => state as UseAuthStore).logout;
+  const user = useAuthStore((state) => (state as { user: User }).user);
+  const [showDialog, setShowDialog] = useState(false);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      window.location.href = "/login";
+      toast.success("Logout successful.");
+    }
+  };
 
   return (
-    <nav className="w-full bg-white shadow border-b sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Left: Logo */}
-        <div className="flex items-center gap-4">
-          <img src={logo} alt="MITS" className="h-12" />
-        </div>
-
-        {/* Center Nav - Desktop Only */}
-        <div className="hidden md:flex gap-8 text-lg font-semibold text-gray-800">
-          <a
-            href="/"
-            className="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 pb-1"
-          >
-            Home
-          </a>
-          <a
-            href="/quiz"
-            className="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 pb-1"
-          >
-            Quiz
-          </a>
-          <a
-            href="/hiring"
-            className="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 pb-1"
-          >
-            Hiring
-          </a>
-          <a
-            href="/profile"
-            className="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 pb-1"
-          >
-            Profile
-          </a>
-          <a
-            href="/developer"
-            className="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 pb-1"
-          >
-            Developer
-          </a>
-        </div>
-
-        {/* Right: User Info & Mobile Menu */}
-        <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <FaUserCircle className="text-2xl text-purple-700" />
-            <span className="text-sm font-semibold">VANSH SHRIVASTAVA</span>
-          </div>
-          <button className="bg-red-100 hover:bg-red-200 text-red-600 text-sm px-3 py-1 rounded">
-            Logout
-          </button>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <button onClick={toggleMenu}>
-            {menuOpen ? (
-              <FaTimes className="text-2xl text-gray-700" />
-            ) : (
-              <FaBars className="text-2xl text-gray-700" />
-            )}
-          </button>
-        </div>
+    <header className="bg-white shadow-md px-4 py-3 flex items-center justify-between w-full fixed top-0 z-50 md:static">
+      {/* Left: Logo and Menu Button */}
+      <div className="flex items-center gap-3">
+        <button className="md:hidden" onClick={toggleSidebar}>
+          {isOpen ? (
+            <FaTimes className="text-xl" />
+          ) : (
+            <FaBars className="text-xl" />
+          )}
+        </button>
+        <img src={logo} alt="Logo" className="h-9 md:h-10 w-auto" />
       </div>
 
-      {/* Mobile Dropdown Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-white border-t shadow px-6 py-4 space-y-3 text-gray-700 text-sm">
-          <a href="/" className="block hover:text-blue-600">
-            Home
-          </a>
-          <a href="/quiz" className="block hover:text-blue-600">
-            Quiz
-          </a>
-          <a href="/hiring" className="block hover:text-blue-600">
-            Hiring
-          </a>
-          <a href="/profile" className="block hover:text-blue-600">
-            Profile
-          </a>
-          <a href="/developer" className="block hover:text-blue-600">
-            Developer
-          </a>
-          <div className="pt-3 border-t">
-            <div className="flex items-center gap-2 mb-2">
-              <FaUserCircle className="text-xl text-purple-700" />
-              <span className="font-semibold">VANSH SHRIVASTAVA</span>
-            </div>
-            <button className="bg-red-100 hover:bg-red-200 text-red-600 text-sm px-3 py-1 rounded">
-              Logout
-            </button>
-          </div>
-        </div>
-      )}
-    </nav>
+      {/* Right: Profile Info & Logout */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {user.profile ? (
+          <img
+            src={user.profile}
+            crossOrigin="anonymous"
+            onError={(e) => (e.currentTarget.src = "/default-profile.png")}
+            alt={user.name || "User"}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+        ) : (
+          <FaUserCircle className="text-2xl text-purple-700" />
+        )}
+
+        {/* Hide name text on small screens */}
+        <span className="text-sm font-semibold hidden sm:block truncate max-w-[100px]">
+          {user.name}
+        </span>
+
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogTrigger asChild>
+            <Button
+              size="sm"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-2xl px-3 py-1 text-xs sm:text-sm"
+              onClick={() => setShowDialog(true)}
+            >
+              <span className="hidden sm:inline">Logout</span>
+              <span className="sm:hidden">
+                <FaSignOutAlt />
+              </span>
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent
+            ref={dialogRef}
+            className="sm:max-w-md border border-gray-100 bg-white shadow-2xl rounded-2xl"
+          >
+            <DialogHeader>
+              <DialogTitle>Are you sure you want to logout?</DialogTitle>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                className="bg-gray-600 hover:bg-gray-700 text-white rounded-2xl"
+                onClick={() => setShowDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white rounded-2xl"
+                onClick={handleLogout}
+              >
+                Confirm Logout
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </header>
   );
 };
 

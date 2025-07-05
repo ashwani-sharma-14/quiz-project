@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
-import { branches } from "@/constants/branched";
 import logo from "@/assets/logo.png";
 import { Eye, EyeOff } from "lucide-react";
 import type { SubmitHandler } from "react-hook-form";
@@ -56,33 +55,6 @@ const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Branch/year extraction
-  const createPairs = (str: string) => str?.match(/.{1,2}/g);
-  let newBranch = "";
-  let newYear = "";
-
-  const extractBranch = (str: string) => {
-    const pairs = createPairs(str);
-    if (str.startsWith("09") && pairs && pairs.length > 2) {
-      newBranch = pairs[2];
-      newYear = "20" + pairs[3];
-    } else if (str.startsWith("BT") && pairs && pairs.length > 2) {
-      newBranch = pairs[1];
-      newYear = "20" + pairs[2];
-    }
-  };
-
-  extractBranch(googleUser?.given_name || "");
-  const branch = branches[newBranch as keyof typeof branches];
-  const admissionYear = parseInt(newYear);
-  const getCurrentYear = (admissionYear: number) => {
-    const now = new Date();
-    let year = now.getFullYear() - admissionYear;
-    if (now.getMonth() + 1 >= 6) year += 1;
-    return Math.min(Math.max(year, 1), 4);
-  };
-  const currentYear = getCurrentYear(admissionYear);
-
   const {
     register,
     handleSubmit,
@@ -90,23 +62,22 @@ const Signup: React.FC = () => {
   } = useForm<ProfileForm>({
     resolver: zodResolver(SignupSchema),
     defaultValues: {
-      name: googleUser?.family_name,
+      name: googleUser?.given_name + " " + googleUser?.family_name,
       email: googleUser?.email,
       profile: googleUser?.picture,
       enrollment: googleUser?.given_name,
-      branch,
-      admissionYear,
-      currentYear,
+      branch: "ET",
+      admissionYear: 2022,
+      currentYear: 4,
     },
-    });
-  
-  
-  
-    const onSubmit: SubmitHandler<ProfileForm> = async (data) => {
-      try {
-        setLoading(true);
-        const success = await signup(data);
-        console.log(success);
+  });
+
+  const onSubmit: SubmitHandler<ProfileForm> = async (data) => {
+    console.log(data);
+    try {
+      setLoading(true);
+      const success = await signup(data);
+      console.log(success);
       setLoading(false);
       if (success) {
         navigate("/");

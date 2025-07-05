@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Navbar from "./NavBar2";
+import Navbar from "./NavBar";
 import Sidebar from "./SideBar";
 
 type LayoutProps = {
