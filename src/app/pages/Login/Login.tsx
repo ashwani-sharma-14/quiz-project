@@ -48,20 +48,21 @@ const Login: React.FC = () => {
 
   return (
     <div className="font-sans bg-[url('@/assets/mits.png')] bg-no-repeat bg-fixed bg-center bg-cover h-screen w-full p-4 flex justify-center items-center">
-      <div className="bg-white/80 rounded-2xl shadow-lg w-full sm:w-96 max-w-[90%] p-6 sm:p-8 text-center hover:shadow-xl">
-        <div className="mb-4 h-24 w-30 mx-auto rounded-full">
+      <div className="bg-white/80 rounded-2xl shadow-lg w-full sm:w-96 max-w-[90%] p-6 sm:p-7 text-center hover:shadow-xl">
+        <div className="mb-3 h-20 w-25 mx-auto ">
           <img src={logo} alt="logo" className="object-cover h-full w-full" />
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Login</h1>
-        <p className="text-gray-600 text-sm mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Login</h1>
+        <p className="text-gray-600 text-sm mb-4">
           to explore MITS T&P Practice Portal..!
         </p>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-5 w-full"
+          className="flex flex-col gap-4 w-full"
         >
+          {/* Email Field */}
           <div className="text-left space-y-1">
             <Label htmlFor="identifier" className="text-base font-medium">
               Email
@@ -83,6 +84,7 @@ const Login: React.FC = () => {
             )}
           </div>
 
+          {/* Password Field */}
           <div className="text-left space-y-1 relative">
             <Label htmlFor="password" className="text-base font-medium">
               Password
@@ -112,6 +114,18 @@ const Login: React.FC = () => {
             )}
           </div>
 
+          {/* Forgot Password Link */}
+          <div className="text-right -mt-2">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-sm text-blue-600 hover:underline focus:outline-none"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
+          {/* Submit Button */}
           <Button
             type="submit"
             disabled={loading}
@@ -121,12 +135,13 @@ const Login: React.FC = () => {
           </Button>
         </form>
 
-        <div className="text-gray-500 text-sm my-4">or</div>
+        <div className="text-gray-500 text-sm my-3">or</div>
 
+        {/* Google Login */}
         <div className="flex flex-col items-center gap-2">
           <GoogleLogin />
-          <p className="text-xs text-gray-600">
-            First time users please sign up using your college ID.
+          <p className="text-xs text-red-600 text-center">
+            New users must Login with Google using your college ID.
           </p>
         </div>
       </div>

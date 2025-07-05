@@ -38,6 +38,7 @@ export const useAuthStore = create(
       isSigningup: false,
       googleUser: {},
       user: {},
+      email: "",
 
       login: async (data: LoginData) => {
         try {
@@ -135,6 +136,60 @@ export const useAuthStore = create(
           return false;
         }
       },
+
+      sendOtp: async (email: string) => {
+        try {
+          const response = await api.post("/user/sendotp", { email });
+          
+          if (response) {
+            set({ email });
+            return {
+              success: response.data.success,
+              message: response.data.message,
+            };
+          }
+        } catch {
+          return false;
+        }
+      },
+
+      verifyOtp: async (code: number) => {
+        const { email } = useAuthStore.getState() as { email: string };
+        try {
+          const response = await api.post("/user/verifyotp", {  code, email });
+          if (response) {
+            return {
+              success: response.data.success,
+              message: response.data.message,
+            };
+          }
+        } catch {
+          return false;
+        }
+      },
+
+      resetPassword: async ( password: string) => {
+        try {
+          const response = await api.post(
+            "/user/resetpassword",
+            {
+              password,
+            },
+          
+          );
+          if (response) {
+            return {
+              success: response.data.success,
+              message: response.data.message,
+            };
+          }
+        } catch {
+          return false;
+        }
+      },
+
+
+
     }),
     {
       name: "auth-storage",
@@ -143,10 +198,12 @@ export const useAuthStore = create(
         const typed = state as {
           isLoggedIn: boolean;
           user: User;
+          email: string;
         };
         return {
           isLoggedIn: typed.isLoggedIn,
           user: typed.user,
+          email: typed.email,
         };
       },
     }

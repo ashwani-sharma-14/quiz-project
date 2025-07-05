@@ -13,6 +13,9 @@ import AuthProvider from "@/app/providers/AuthProvider";
 // Lazy-loaded components
 const Login = lazy(() => import("@/app/pages/Login/Login"));
 const Signup = lazy(() => import("@/app/pages/SignUp/Signup"));
+const VerifyEmail = lazy(() => import("@/app/pages/ForgotPassword/VerifyEmail"));
+const VerifyOTP = lazy(() => import("@/app/pages/ForgotPassword/VerifyOTP"));
+const ResetPassword = lazy(() => import("@/app/pages/ForgotPassword/ResetPassword"));
 
 import Home from "@/app/pages/Home/Home";
 import Quiz from "@/app/pages/Quiz/Quiz";
@@ -24,6 +27,7 @@ import QuizAnalysis from "@/app/pages/QuizAnalysis/QuizAnalysis";
 import QuizReview from "@/app/pages/QuizReview/QuizReview";
 import PreviousQuizzes from "@/app/pages/PreviousQuizzes/PreviousQuizzes";
 import AuthSkeleton from "@/components/skeleton/AuthSkeletion";
+
 
 export default function Routes() {
   const router = createBrowserRouter(
@@ -50,6 +54,30 @@ export default function Routes() {
           element={
             <Suspense fallback={<AuthSkeleton />}>
               <Signup />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <Suspense fallback={<AuthSkeleton />}>
+              <VerifyEmail />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/verify-otp"
+          element={
+            <Suspense fallback={<AuthSkeleton />}>
+              <VerifyOTP />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <Suspense fallback={<AuthSkeleton />}>
+              <ResetPassword />
             </Suspense>
           }
         />

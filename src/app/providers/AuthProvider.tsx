@@ -6,7 +6,7 @@ interface UseAuthStore {
   isLoggedIn: boolean;
 }
 
-const PUBLIC_ROUTES = ["/login", "/sign-up"];
+const PUBLIC_ROUTES = ["/login", "/sign-up", "/forgot-password","/verify-otp", "/reset-password"];
 
 function getCookie(name: string) {
   // More robust cookie parsing
