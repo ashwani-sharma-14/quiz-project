@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://quiz-project-fp0e.onrender.com/api",
   withCredentials: true,
 });
 
@@ -13,7 +13,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         await axios.post(
-          "http://localhost:5000/api/admin/refresh",
+          "https://quiz-project-fp0e.onrender.com/api/admin/refresh",
           {},
           { withCredentials: true }
         );

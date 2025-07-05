@@ -12,8 +12,8 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://placement-quiz-practice-portal.netlify.app",
-      "https://placement-quiz-practice-admin.netlify.app",
+      "https://adminpannel-iota.vercel.app/",
+      "https://placementpreparation-theta.vercel.app",
       "http://localhost:5173",
     ],
     credentials: true,
@@ -46,6 +46,5 @@ if (!fs.existsSync(uploadsPath)) {
 app.use("/uploads", express.static(uploadsPath));
 
 app.use(globalErrorHandler);
-
 
 export default app;

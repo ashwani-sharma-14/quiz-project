@@ -25,3 +25,4 @@ dist-ssr
 *.suo
 *.ntvs*
 *.njsproj
+.vercel
