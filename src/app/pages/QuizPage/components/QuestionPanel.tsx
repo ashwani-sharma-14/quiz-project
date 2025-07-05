@@ -1,12 +1,10 @@
-// src/app/pages/QuizPage/components/QuestionPanel.tsx
 import React from "react";
 
 interface Props {
   question: {
-    id: number;
+    id: string;
     question: string;
     options: string[];
-    correctAnswer: string;
   };
   selectedOption: string | null;
   onOptionChange: (value: string) => void;
@@ -25,30 +23,33 @@ const QuestionPanel: React.FC<Props> = ({
   onSaveMarkForReview,
   setShowSummary,
 }) => {
+
+  
+
+  const renderOption = (value: string) => (
+    <label
+      key={value}
+      className="block p-3 rounded cursor-pointer bg-gray-100 hover:bg-gray-200"
+    >
+      <input
+        type="radio"
+        name={`question-${question.id}`}
+        value={value}
+        checked={selectedOption === value}
+        onChange={() => onOptionChange(value)}
+        className="mr-2"
+      />
+      {value}
+    </label>
+  );
+
   return (
     <div className="flex-1 bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        Q{question.id}. {question.question}
-      </h2>
-      <div className="space-y-3 mb-4">
-        {question.options.map((option, idx) => (
-          <label
-            key={idx}
-            className="block bg-gray-100 p-3 rounded cursor-pointer hover:bg-gray-200"
-          >
-            <input
-              type="radio"
-              name={`question-${question.id}`}
-              value={option}
-              checked={selectedOption === option}
-              onChange={() => onOptionChange(option)}
-              className="mr-2"
-            />
-            {option}
-          </label>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-3 mt-4">
+      <h2 className="text-lg font-semibold mb-4">Q. {question.question}</h2>
+
+      <div className="space-y-3 mb-4">{question.options.map(renderOption)}</div>
+
+      <div className="flex flex-wrap gap-3 mt-4 items-center">
         <button
           onClick={onClear}
           className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
@@ -65,7 +66,7 @@ const QuestionPanel: React.FC<Props> = ({
           onClick={onNext}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Next
+          Save & Next
         </button>
         <button
           onClick={() => setShowSummary(true)}

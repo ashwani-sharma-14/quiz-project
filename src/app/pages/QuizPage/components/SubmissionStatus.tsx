@@ -1,6 +1,7 @@
 // src/app/pages/QuizPage/components/SubmissionStatus.tsx
 import React from "react";
-import { X } from "lucide-react";
+import { Loader, X } from "lucide-react";
+
 
 interface SubmissionStatusProps {
   answered: number;
@@ -8,9 +9,11 @@ interface SubmissionStatusProps {
   total: number;
   onConfirmSubmit: () => void;
   onClose: () => void;
+  loading: boolean
 }
 
 const SubmissionStatus: React.FC<SubmissionStatusProps> = ({
+  loading,
   answered,
   reviewed,
   total,
@@ -18,7 +21,7 @@ const SubmissionStatus: React.FC<SubmissionStatusProps> = ({
   onClose,
 }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-white rounded-md p-8 max-w-lg w-full text-center relative shadow-lg">
         <button
           onClick={onClose}
@@ -36,9 +39,16 @@ const SubmissionStatus: React.FC<SubmissionStatusProps> = ({
         </ul>
         <button
           onClick={onConfirmSubmit}
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 flex items-center justify-center gap-2"
         >
-          Submit & View Analysis
+          {loading ? (
+            <>
+              <Loader className="animate-spin w-4 h-4" />
+              Submitting...
+            </>
+          ) : (
+            "Submit & View Analysis"
+          )}
         </button>
       </div>
     </div>
