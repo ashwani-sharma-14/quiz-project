@@ -1,8 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-
+const base_url = import.meta.env.VITE_API_BASE_URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: base_url,
   withCredentials: true,
 });
 
@@ -25,7 +25,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         await axios.post(
-          "http://localhost:5000/api/user/refresh",
+          `${base_url}/user/refresh`,
           {},
           { withCredentials: true }
         );

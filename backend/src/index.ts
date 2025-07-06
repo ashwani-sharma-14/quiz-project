@@ -1,9 +1,9 @@
 import http from "http";
 import app from "./app";
-
+import { env } from "./config/env.config";
 
 const server = http.createServer(app);
 
-server.listen(5000, () => {
-  console.log("Server is running on port 5000");
+server.listen(env.port, () => {
+  console.log(`Server running on port ${env.port}`);
 });

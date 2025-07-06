@@ -12,7 +12,7 @@ export const setAuthCookie = (
   res.cookie("accessToken", accessToken, {
     httpOnly: false,
     secure: isProduction,
-    // sameSite: "none",
+    sameSite: "none",
     maxAge: 15 * 60 * 1000,
   });
 
@@ -20,7 +20,7 @@ export const setAuthCookie = (
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      // sameSite: "none",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
