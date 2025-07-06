@@ -12,7 +12,7 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://adminpannel-iota.vercel.app/",
+      "https://adminpannel-iota.vercel.app",
       "https://placementpreparation-theta.vercel.app",
       "http://localhost:5173",
     ],
