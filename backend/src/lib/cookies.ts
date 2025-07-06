@@ -36,7 +36,7 @@ export const setOtpCookie = (res: Response, token: string) => {
   res.cookie("otp_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    // sameSite: "none",
+    sameSite: "none",
     maxAge: 10 * 60 * 1000,
   });
 };
@@ -45,6 +45,6 @@ export const clearOtpCookie = (res: Response) => {
   res.clearCookie("otp_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    // sameSite: "none",
+    sameSite: "none",
   });
 };
