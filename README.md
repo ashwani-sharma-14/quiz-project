@@ -3,7 +3,6 @@
 A full-stack monorepo for a Placement Preparation Platform, featuring:
 
 - **Admin Frontend**: Manage quizzes, jobs, and users.
-- **User Frontend**: Take quizzes, view analytics, and manage your profile.
 - **Backend**: REST API with authentication, quiz/job management, and file uploads.
 
 ---
